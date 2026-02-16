@@ -11,7 +11,7 @@ export class ReportController {
                 return res.status(400).json({ message: 'Student ID required' });
             }
 
-            const report = await reportService.generateStudentReportCard(parseInt(studentId));
+            const report = await reportService.getStudentReportCard(studentId);
             res.json(report);
         } catch (error: any) {
             if (error.message === 'Student not found') {
@@ -28,7 +28,7 @@ export class ReportController {
                 return res.status(400).json({ message: 'Class ID required' });
             }
 
-            const report = await reportService.generateClassPerformanceReport(parseInt(classId));
+            const report = await reportService.getClassPerformanceReport(classId);
             res.json(report);
         } catch (error: any) {
             if (error.message === 'Class not found') {
@@ -40,18 +40,13 @@ export class ReportController {
 
     async generateAttendanceReport(req: Request, res: Response, next: NextFunction) {
         try {
-            const { classId, studentId, startDate, endDate } = req.query;
+            const { classId, startDate, endDate } = req.query;
 
-            if (!startDate || !endDate) {
-                return res.status(400).json({ message: 'Start date and end date required' });
-            }
-
-            const report = await reportService.generateAttendanceReport({
-                ...(classId && { classId: parseInt(classId as string) }),
-                ...(studentId && { studentId: parseInt(studentId as string) }),
-                startDate: new Date(startDate as string),
-                endDate: new Date(endDate as string),
-            });
+            const report = await reportService.getAttendanceReport(
+                classId as string | undefined,
+                startDate ? new Date(startDate as string) : undefined,
+                endDate ? new Date(endDate as string) : undefined,
+            );
 
             res.json(report);
         } catch (error) {
@@ -61,13 +56,12 @@ export class ReportController {
 
     async generateFeeCollectionReport(req: Request, res: Response, next: NextFunction) {
         try {
-            const { startDate, endDate, status } = req.query;
+            const { startDate, endDate } = req.query;
 
-            const report = await reportService.generateFeeCollectionReport({
-                ...(startDate && { startDate: new Date(startDate as string) }),
-                ...(endDate && { endDate: new Date(endDate as string) }),
-                ...(status && { status: status as string }),
-            });
+            const report = await reportService.getFeeCollectionReport(
+                startDate ? new Date(startDate as string) : undefined,
+                endDate ? new Date(endDate as string) : undefined,
+            );
 
             res.json(report);
         } catch (error) {
@@ -77,12 +71,7 @@ export class ReportController {
 
     async generateTeacherWorkloadReport(req: Request, res: Response, next: NextFunction) {
         try {
-            const teacherId = req.query.teacherId;
-
-            const report = await reportService.generateTeacherWorkloadReport(
-                teacherId ? parseInt(teacherId as string) : undefined
-            );
-
+            const report = await reportService.getTeacherWorkloadReport();
             res.json(report);
         } catch (error) {
             next(error);

@@ -37,7 +37,7 @@ export async function getMyNotifications(req: Request, res: Response) {
                 userRoles.includes('PARENT') ? 'PARENT' : 'USER';
 
         // TODO: Get classId if student
-        const classId = undefined; // Need to fetch student profile to get classId
+        const classId: string | undefined = undefined; // Need to fetch student profile to get classId
 
         const notifications = await service.getNotificationsForUser(userId, role, classId);
         res.json(notifications);

@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Samavastra — Launch Centre</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        :root {
+            --bg: #0a0a12;
+            --surface: #12121e;
+            --surface2: #1a1a2e;
+            --border: rgba(255, 255, 255, .06);
+            --text: #e4e4ed;
+            --text-muted: #8888a4;
+            --accent-purple: #7c3aed;
+            --accent-blue: #3b82f6;
+            --accent-teal: #14b8a6;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --glow-purple: rgba(124, 58, 237, .35);
+            --glow-blue: rgba(59, 130, 246, .35);
+            --glow-teal: rgba(20, 184, 166, .35);
+        }
+
+        html {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+            position: relative
+        }
+
+        /* Ambient background */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background:
+                radial-gradient(ellipse 800px 500px at 20% 20%, rgba(124, 58, 237, .08), transparent),
+                radial-gradient(ellipse 600px 400px at 80% 60%, rgba(59, 130, 246, .06), transparent),
+                radial-gradient(ellipse 500px 300px at 50% 90%, rgba(20, 184, 166, .05), transparent);
+            pointer-events: none;
+        }
+
+        /* Floating orbs */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: .4;
+            pointer-events: none;
+            z-index: 0;
+            animation: drift 20s ease-in-out infinite alternate
+        }
+
+        .orb-1 {
+            width: 400px;
+            height: 400px;
+            background: var(--accent-purple);
+            top: -100px;
+            left: -100px;
+            animation-delay: 0s
+        }
+
+        .orb-2 {
+            width: 300px;
+            height: 300px;
+            background: var(--accent-blue);
+            bottom: -80px;
+            right: -80px;
+            animation-delay: -5s
+        }
+
+        .orb-3 {
+            width: 250px;
+            height: 250px;
+            background: var(--accent-teal);
+            top: 40%;
+            left: 60%;
+            animation-delay: -10s
+        }
+
+        @keyframes drift {
+            0% {
+                transform: translate(0, 0) scale(1)
+            }
+
+            50% {
+                transform: translate(30px, -40px) scale(1.1)
+            }
+
+            100% {
+                transform: translate(-20px, 30px) scale(.95)
+            }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1100px;
+            width: 100%;
+            padding: 0 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            padding: 80px 0 40px;
+            width: 100%
+        }
+
+        .logo-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, rgba(124, 58, 237, .15), rgba(59, 130, 246, .15));
+            border: 1px solid rgba(124, 58, 237, .25);
+            border-radius: 100px;
+            padding: 8px 20px;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: .5px;
+            color: var(--accent-purple);
+            margin-bottom: 28px;
+            backdrop-filter: blur(12px);
+        }
+
+        .logo-badge .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent-teal);
+            animation: pulse 2s ease-in-out infinite
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1)
+            }
+
+            50% {
+                opacity: .4;
+                transform: scale(.8)
+            }
+        }
+
+        h1 {
+            font-size: clamp(2.2rem, 5vw, 3.8rem);
+            font-weight: 800;
+            letter-spacing: -.03em;
+            line-height: 1.1;
+            background: linear-gradient(135deg, #fff 0%, #c4b5fd 40%, #93c5fd 70%, #5eead4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 16px
+        }
+
+        .subtitle {
+            font-size: clamp(1rem, 2vw, 1.15rem);
+            color: var(--text-muted);
+            max-width: 520px;
+            margin: 0 auto;
+            line-height: 1.6
+        }
+
+        /* Status bar */
+        .status-bar {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 36px auto 48px;
+            padding: 14px 28px;
+            border-radius: 16px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            backdrop-filter: blur(12px);
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-muted)
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%
+        }
+
+        .status-dot.live {
+            background: #22c55e;
+            box-shadow: 0 0 8px rgba(34, 197, 94, .5);
+            animation: pulse 2s infinite
+        }
+
+        .status-dot.ready {
+            background: var(--accent-amber);
+            box-shadow: 0 0 8px rgba(245, 158, 11, .4)
+        }
+
+        .status-dot.off {
+            background: #666
+        }
+
+        .status-label {
+            font-weight: 500;
+            color: var(--text)
+        }
+
+        /* Cards grid */
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            width: 100%;
+            margin-bottom: 40px
+        }
+
+        .card {
+            position: relative;
+            border-radius: 20px;
+            padding: 36px 32px;
+            overflow: hidden;
+            cursor: pointer;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            transition: all .35s cubic-bezier(.4, 0, .2, 1);
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 20px;
+            opacity: 0;
+            transition: opacity .35s ease;
+            pointer-events: none;
+        }
+
+        .card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(255, 255, 255, .12);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, .4)
+        }
+
+        .card:hover::before {
+            opacity: 1
+        }
+
+        .card--chalkboard::before {
+            background: linear-gradient(135deg, rgba(59, 130, 246, .08), rgba(20, 184, 166, .06))
+        }
+
+        .card--chalkboard:hover {
+            border-color: rgba(59, 130, 246, .3);
+            box-shadow: 0 20px 60px rgba(59, 130, 246, .12)
+        }
+
+        .card--samavest::before {
+            background: linear-gradient(135deg, rgba(124, 58, 237, .08), rgba(244, 63, 94, .06))
+        }
+
+        .card--samavest:hover {
+            border-color: rgba(124, 58, 237, .3);
+            box-shadow: 0 20px 60px rgba(124, 58, 237, .12)
+        }
+
+        .card--api::before {
+            background: linear-gradient(135deg, rgba(20, 184, 166, .08), rgba(245, 158, 11, .06))
+        }
+
+        .card--api:hover {
+            border-color: rgba(20, 184, 166, .3);
+            box-shadow: 0 20px 60px rgba(20, 184, 166, .12)
+        }
+
+        .card-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .card--chalkboard .card-icon {
+            background: linear-gradient(135deg, rgba(59, 130, 246, .2), rgba(20, 184, 166, .15));
+            border: 1px solid rgba(59, 130, 246, .2)
+        }
+
+        .card--samavest .card-icon {
+            background: linear-gradient(135deg, rgba(124, 58, 237, .2), rgba(244, 63, 94, .15));
+            border: 1px solid rgba(124, 58, 237, .2)
+        }
+
+        .card--api .card-icon {
+            background: linear-gradient(135deg, rgba(20, 184, 166, .2), rgba(245, 158, 11, .15));
+            border: 1px solid rgba(20, 184, 166, .2)
+        }
+
+        .card h2 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+            letter-spacing: -.01em
+        }
+
+        .card .card-type {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            font-weight: 600;
+            margin-bottom: 14px;
+            display: block
+        }
+
+        .card--chalkboard .card-type {
+            color: var(--accent-blue)
+        }
+
+        .card--samavest .card-type {
+            color: var(--accent-purple)
+        }
+
+        .card--api .card-type {
+            color: var(--accent-teal)
+        }
+
+        .card p {
+            font-size: .9rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 20px
+        }
+
+        .card-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 10px 18px;
+            border-radius: 10px;
+            transition: all .2s ease;
+        }
+
+        .card--chalkboard .card-action {
+            background: rgba(59, 130, 246, .12);
+            color: var(--accent-blue)
+        }
+
+        .card--chalkboard .card-action:hover {
+            background: rgba(59, 130, 246, .2)
+        }
+
+        .card--samavest .card-action {
+            background: rgba(124, 58, 237, .12);
+            color: var(--accent-purple)
+        }
+
+        .card--samavest .card-action:hover {
+            background: rgba(124, 58, 237, .2)
+        }
+
+        .card--api .card-action {
+            background: rgba(20, 184, 166, .12);
+            color: var(--accent-teal)
+        }
+
+        .card--api .card-action:hover {
+            background: rgba(20, 184, 166, .2)
+        }
+
+        .card-action .arrow {
+            transition: transform .2s ease
+        }
+
+        .card:hover .card-action .arrow {
+            transform: translateX(4px)
+        }
+
+        /* Credentials section */
+        .credentials {
+            width: 100%;
+            max-width: 700px;
+            margin: 0 auto 40px;
+            border-radius: 18px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 32px;
+            backdrop-filter: blur(12px);
+        }
+
+        .credentials h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .cred-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px
+        }
+
+        .cred-item {
+            padding: 12px 16px;
+            border-radius: 10px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: all .2s ease;
+            position: relative;
+        }
+
+        .cred-item:hover {
+            border-color: rgba(124, 58, 237, .3);
+            background: rgba(124, 58, 237, .06)
+        }
+
+        .cred-item .role {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: .8px;
+            font-weight: 600;
+            color: var(--accent-purple);
+            margin-bottom: 6px
+        }
+
+        .cred-item .email {
+            font-size: 13px;
+            color: var(--text);
+            font-weight: 500
+        }
+
+        .cred-item .pass {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 3px
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 28px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            padding: 12px 24px;
+            background: var(--accent-purple);
+            color: #fff;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 500;
+            z-index: 999;
+            transition: transform .3s ease;
+            pointer-events: none;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0)
+        }
+
+        /* Quick start guide */
+        .quick-start {
+            width: 100%;
+            max-width: 700px;
+            margin: 0 auto 60px;
+            border-radius: 18px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 32px;
+        }
+
+        .quick-start h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .steps {
+            display: flex;
+            flex-direction: column;
+            gap: 12px
+        }
+
+        .step {
+            display: flex;
+            gap: 14px;
+            align-items: flex-start
+        }
+
+        .step-num {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            flex-shrink: 0;
+            background: linear-gradient(135deg, rgba(124, 58, 237, .15), rgba(59, 130, 246, .15));
+            border: 1px solid rgba(124, 58, 237, .2);
+            color: var(--accent-purple);
+        }
+
+        .step-text {
+            font-size: .88rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            padding-top: 3px
+        }
+
+        .step-text code {
+            background: rgba(124, 58, 237, .1);
+            color: var(--accent-purple);
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-family: 'Fira Code', 'Cascadia Code', monospace
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 20px 0 40px;
+            color: var(--text-muted);
+            font-size: 12px
+        }
+
+        footer span {
+            background: linear-gradient(90deg, var(--accent-purple), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 600
+        }
+
+        @media(max-width:640px) {
+            header {
+                padding: 50px 0 30px
+            }
+
+            .cards {
+                grid-template-columns: 1fr
+            }
+
+            .status-bar {
+                flex-direction: column;
+                gap: 10px
+            }
+
+            .cred-grid {
+                grid-template-columns: 1fr
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <div class="container">
+        <header>
+            <div class="logo-badge">
+                <div class="dot"></div>
+                SAMAVASTRA PLATFORM
+            </div>
+            <h1>Launch Centre</h1>
+            <p class="subtitle">Your unified gateway to the Chalkboard student portal, Samavest ERP dashboard, and the
+                backend API.</p>
+        </header>
+
+        <!-- Live status -->
+        <div class="status-bar">
+            <div class="status-item">
+                <div class="status-dot" id="api-dot"></div>
+                <span class="status-label">API Server</span>
+                <span id="api-status">Checking…</span>
+            </div>
+            <div class="status-item">
+                <div class="status-dot" id="chalk-dot"></div>
+                <span class="status-label">Chalkboard</span>
+                <span id="chalk-status">Checking…</span>
+            </div>
+            <div class="status-item">
+                <div class="status-dot" id="sama-dot"></div>
+                <span class="status-label">Samavest</span>
+                <span id="sama-status">Checking…</span>
+            </div>
+        </div>
+
+        <!-- Portal cards -->
+        <div class="cards">
+            <a href="https://samavastra-3d457-chalkboard.web.app" target="_blank" class="card card--chalkboard"
+                id="card-chalk">
+                <div class="card-icon">🎓</div>
+                <span class="card-type">Student Portal</span>
+                <h2>Chalkboard</h2>
+                <p>Student-facing marketplace, homework submissions, fee payments, and academic dashboards.</p>
+                <div class="card-action">
+                    Open Portal <span class="arrow">→</span>
+                </div>
+            </a>
+
+            <a href="https://samavastra-portal.web.app" target="_blank" class="card card--samavest" id="card-sama">
+                <div class="card-icon">🏢</div>
+                <span class="card-type">Admin ERP</span>
+                <h2>Samavest</h2>
+                <p>Internal operations — inventory, orders, logistics, production tracking, user management, and
+                    analytics.</p>
+                <div class="card-action">
+                    Open Dashboard <span class="arrow">→</span>
+                </div>
+            </a>
+
+            <a href="https://samavastra-3d457.web.app/api" target="_blank" class="card card--api" id="card-api">
+                <div class="card-icon">⚡</div>
+                <span class="card-type">Backend</span>
+                <h2>API Server</h2>
+                <p>Express + Firestore backend powering both portals. REST endpoints for auth, marketplace, academics,
+                    and more.</p>
+                <div class="card-action">
+                    Open API <span class="arrow">→</span>
+                </div>
+            </a>
+        </div>
+
+        <!-- Test credentials -->
+        <div class="credentials">
+            <h3>🔑 Test Credentials <span
+                    style="font-weight:400;color:var(--text-muted);font-size:12px;margin-left:4px">(click to
+                    copy)</span></h3>
+            <div class="cred-grid">
+                <div class="cred-item" onclick="copyEmail('admin@samavest.com')">
+                    <div class="role">Admin</div>
+                    <div class="email">admin@samavest.com</div>
+                    <div class="pass">Password: 12345678</div>
+                </div>
+                <div class="cred-item" onclick="copyEmail('john.doe@chalkboard.com')">
+                    <div class="role">Student</div>
+                    <div class="email">john.doe@chalkboard.com</div>
+                    <div class="pass">Password: 12345678</div>
+                </div>
+                <div class="cred-item" onclick="copyEmail('finance@samavest.com')">
+                    <div class="role">Staff</div>
+                    <div class="email">finance@samavest.com</div>
+                    <div class="pass">Password: 12345678</div>
+                </div>
+                <div class="cred-item" onclick="copyEmail('jane.smith@school.com')">
+                    <div class="role">Teacher</div>
+                    <div class="email">jane.smith@school.com</div>
+                    <div class="pass">Password: 12345678</div>
+                </div>
+                <div class="cred-item" onclick="copyEmail('parent@chalkboard.com')">
+                    <div class="role">Parent</div>
+                    <div class="email">parent@chalkboard.com</div>
+                    <div class="pass">Password: 12345678</div>
+                </div>
+                <div class="cred-item" onclick="copyEmail('admin@school.com')">
+                    <div class="role">School Admin</div>
+                    <div class="email">admin@school.com</div>
+                    <div class="pass">Password: 12345678</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick start -->
+        <div class="quick-start">
+            <h3>🚀 Quick Start</h3>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-num">1</div>
+                    <div class="step-text">Start the <strong>API server</strong> — <code>npm run dev</code> from the
+                        project root (port 3000)</div>
+                </div>
+                <div class="step">
+                    <div class="step-num">2</div>
+                    <div class="step-text">Start <strong>Chalkboard</strong> —
+                        <code>cd chalkboard-portal && npm run dev</code> (port 5173)
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-num">3</div>
+                    <div class="step-text">Start <strong>Samavest</strong> —
+                        <code>cd samavest-portal && npm run dev</code> (port 5174)
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-num">4</div>
+                    <div class="step-text">Seed Firestore — <code>npm run seed</code> (run once to populate test data)
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            Built with 🔥 Firebase &middot; Powered by <span>Samavastra</span>
+        </footer>
+    </div>
+
+    <div class="toast" id="toast">📋 Email copied!</div>
+
+    <script>
+        // Health-check each service
+        async function checkService(url, dotId, statusId, label) {
+            const dot = document.getElementById(dotId);
+            const status = document.getElementById(statusId);
+            try {
+                const controller = new AbortController();
+                const timeout = setTimeout(() => controller.abort(), 3000);
+                await fetch(url, { mode: 'no-cors', signal: controller.signal });
+                clearTimeout(timeout);
+                dot.className = 'status-dot live';
+                status.textContent = 'Online';
+                status.style.color = '#22c55e';
+            } catch {
+                dot.className = 'status-dot off';
+                status.textContent = 'Offline';
+                status.style.color = '#888';
+            }
+        }
+
+        function runChecks() {
+            checkService('https://samavastra-3d457.web.app/api', 'api-dot', 'api-status', 'API');
+            checkService('https://samavastra-3d457-chalkboard.web.app', 'chalk-dot', 'chalk-status', 'Chalkboard');
+            checkService('https://samavastra-portal.web.app', 'sama-dot', 'sama-status', 'Samavest');
+        }
+
+        runChecks();
+        setInterval(runChecks, 8000);
+
+        // Copy email to clipboard
+        function copyEmail(email) {
+            navigator.clipboard.writeText(email);
+            const toast = document.getElementById('toast');
+            toast.textContent = '📋 Copied: ' + email;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+    </script>
+</body>
+
+</html>

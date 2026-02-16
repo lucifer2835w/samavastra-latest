@@ -1,6 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.prisma = void 0;
-const client_1 = require("../generated/prisma/client");
-exports.prisma = new client_1.PrismaClient();
+exports.db = void 0;
+// Re-export Firestore db from firebase config
+// All services should import { db } from this file
+var firebase_1 = require("./firebase");
+Object.defineProperty(exports, "db", { enumerable: true, get: function () { return firebase_1.db; } });
 //# sourceMappingURL=db.js.map

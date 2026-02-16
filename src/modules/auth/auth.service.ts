@@ -1,4 +1,4 @@
-import { prisma } from '../../config/db';
+import { db } from '../../config/firebase';
 import { comparePassword } from '../../shared/utils/password';
 import { signJwt } from '../../shared/utils/jwt';
 
@@ -7,23 +7,34 @@ export class AuthService {
     console.log('validateUser called with email:', email);
 
     try {
-      const user = await prisma.user.findUnique({
-        where: { email },
-        include: { roles: { include: { role: true } } },
-      });
+      // Find user by email
+      const usersSnap = await db.collection('users').where('email', '==', email).limit(1).get();
 
-      console.log('User query result:', user ? 'Found user' : 'No user found');
+      if (usersSnap.empty) {
+        console.log('No user found');
+        return null;
+      }
 
-      if (!user) return null;
+      const userDoc = usersSnap.docs[0];
+      const user = { id: userDoc.id, ...userDoc.data() } as any;
+
+      console.log('User query result:', 'Found user');
 
       const passwordValid = await comparePassword(password, user.passwordHash);
       if (!passwordValid) return null;
 
-      const roles = user.roles.map((r: any) => ({
-        id: r.role.id,
-        name: r.role.name,
-        description: r.role.description,
-      }));
+      // Get roles for the user
+      const rolesSnap = await db.collection('userRoles').where('userId', '==', user.id).get();
+      const roles: any[] = [];
+
+      for (const roleDoc of rolesSnap.docs) {
+        const roleData = roleDoc.data();
+        const roleRef = await db.collection('roles').doc(roleData.roleId).get();
+        if (roleRef.exists) {
+          const role = { id: roleRef.id, ...roleRef.data() };
+          roles.push(role);
+        }
+      }
 
       const token = signJwt({ id: user.id, roles: roles.map(r => r.name) });
 

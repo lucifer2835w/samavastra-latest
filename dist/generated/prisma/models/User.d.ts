@@ -215,6 +215,10 @@ export type UserWhereInput = {
     department?: Prisma.XOR<Prisma.DepartmentNullableScalarRelationFilter, Prisma.DepartmentWhereInput> | null;
     roles?: Prisma.UserRoleListRelationFilter;
     student?: Prisma.XOR<Prisma.StudentNullableScalarRelationFilter, Prisma.StudentWhereInput> | null;
+    teacher?: Prisma.XOR<Prisma.TeacherNullableScalarRelationFilter, Prisma.TeacherWhereInput> | null;
+    parent?: Prisma.XOR<Prisma.ParentNullableScalarRelationFilter, Prisma.ParentWhereInput> | null;
+    sentNotifications?: Prisma.NotificationListRelationFilter;
+    receivedNotifications?: Prisma.NotificationListRelationFilter;
 };
 export type UserOrderByWithRelationInput = {
     id?: Prisma.SortOrder;
@@ -230,6 +234,10 @@ export type UserOrderByWithRelationInput = {
     department?: Prisma.DepartmentOrderByWithRelationInput;
     roles?: Prisma.UserRoleOrderByRelationAggregateInput;
     student?: Prisma.StudentOrderByWithRelationInput;
+    teacher?: Prisma.TeacherOrderByWithRelationInput;
+    parent?: Prisma.ParentOrderByWithRelationInput;
+    sentNotifications?: Prisma.NotificationOrderByRelationAggregateInput;
+    receivedNotifications?: Prisma.NotificationOrderByRelationAggregateInput;
 };
 export type UserWhereUniqueInput = Prisma.AtLeast<{
     id?: number;
@@ -248,6 +256,10 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
     department?: Prisma.XOR<Prisma.DepartmentNullableScalarRelationFilter, Prisma.DepartmentWhereInput> | null;
     roles?: Prisma.UserRoleListRelationFilter;
     student?: Prisma.XOR<Prisma.StudentNullableScalarRelationFilter, Prisma.StudentWhereInput> | null;
+    teacher?: Prisma.XOR<Prisma.TeacherNullableScalarRelationFilter, Prisma.TeacherWhereInput> | null;
+    parent?: Prisma.XOR<Prisma.ParentNullableScalarRelationFilter, Prisma.ParentWhereInput> | null;
+    sentNotifications?: Prisma.NotificationListRelationFilter;
+    receivedNotifications?: Prisma.NotificationListRelationFilter;
 }, "id" | "email">;
 export type UserOrderByWithAggregationInput = {
     id?: Prisma.SortOrder;
@@ -293,6 +305,10 @@ export type UserCreateInput = {
     department?: Prisma.DepartmentCreateNestedOneWithoutUsersInput;
     roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput;
     student?: Prisma.StudentCreateNestedOneWithoutUserInput;
+    teacher?: Prisma.TeacherCreateNestedOneWithoutUserInput;
+    parent?: Prisma.ParentCreateNestedOneWithoutUserInput;
+    sentNotifications?: Prisma.NotificationCreateNestedManyWithoutSenderInput;
+    receivedNotifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput;
 };
 export type UserUncheckedCreateInput = {
     id?: number;
@@ -307,6 +323,10 @@ export type UserUncheckedCreateInput = {
     updatedAt?: Date | string;
     roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput;
     student?: Prisma.StudentUncheckedCreateNestedOneWithoutUserInput;
+    teacher?: Prisma.TeacherUncheckedCreateNestedOneWithoutUserInput;
+    parent?: Prisma.ParentUncheckedCreateNestedOneWithoutUserInput;
+    sentNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutSenderInput;
+    receivedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput;
 };
 export type UserUpdateInput = {
     email?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -320,6 +340,10 @@ export type UserUpdateInput = {
     department?: Prisma.DepartmentUpdateOneWithoutUsersNestedInput;
     roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput;
     student?: Prisma.StudentUpdateOneWithoutUserNestedInput;
+    teacher?: Prisma.TeacherUpdateOneWithoutUserNestedInput;
+    parent?: Prisma.ParentUpdateOneWithoutUserNestedInput;
+    sentNotifications?: Prisma.NotificationUpdateManyWithoutSenderNestedInput;
+    receivedNotifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput;
 };
 export type UserUncheckedUpdateInput = {
     id?: Prisma.IntFieldUpdateOperationsInput | number;
@@ -334,6 +358,10 @@ export type UserUncheckedUpdateInput = {
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput;
     student?: Prisma.StudentUncheckedUpdateOneWithoutUserNestedInput;
+    teacher?: Prisma.TeacherUncheckedUpdateOneWithoutUserNestedInput;
+    parent?: Prisma.ParentUncheckedUpdateOneWithoutUserNestedInput;
+    sentNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutSenderNestedInput;
+    receivedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput;
 };
 export type UserCreateManyInput = {
     id?: number;
@@ -417,6 +445,10 @@ export type UserScalarRelationFilter = {
     is?: Prisma.UserWhereInput;
     isNot?: Prisma.UserWhereInput;
 };
+export type UserNullableScalarRelationFilter = {
+    is?: Prisma.UserWhereInput | null;
+    isNot?: Prisma.UserWhereInput | null;
+};
 export type UserListRelationFilter = {
     every?: Prisma.UserWhereInput;
     some?: Prisma.UserWhereInput;
@@ -475,6 +507,56 @@ export type UserUpdateOneRequiredWithoutStudentNestedInput = {
     connect?: Prisma.UserWhereUniqueInput;
     update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutStudentInput, Prisma.UserUpdateWithoutStudentInput>, Prisma.UserUncheckedUpdateWithoutStudentInput>;
 };
+export type UserCreateNestedOneWithoutTeacherInput = {
+    create?: Prisma.XOR<Prisma.UserCreateWithoutTeacherInput, Prisma.UserUncheckedCreateWithoutTeacherInput>;
+    connectOrCreate?: Prisma.UserCreateOrConnectWithoutTeacherInput;
+    connect?: Prisma.UserWhereUniqueInput;
+};
+export type UserUpdateOneRequiredWithoutTeacherNestedInput = {
+    create?: Prisma.XOR<Prisma.UserCreateWithoutTeacherInput, Prisma.UserUncheckedCreateWithoutTeacherInput>;
+    connectOrCreate?: Prisma.UserCreateOrConnectWithoutTeacherInput;
+    upsert?: Prisma.UserUpsertWithoutTeacherInput;
+    connect?: Prisma.UserWhereUniqueInput;
+    update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutTeacherInput, Prisma.UserUpdateWithoutTeacherInput>, Prisma.UserUncheckedUpdateWithoutTeacherInput>;
+};
+export type UserCreateNestedOneWithoutParentInput = {
+    create?: Prisma.XOR<Prisma.UserCreateWithoutParentInput, Prisma.UserUncheckedCreateWithoutParentInput>;
+    connectOrCreate?: Prisma.UserCreateOrConnectWithoutParentInput;
+    connect?: Prisma.UserWhereUniqueInput;
+};
+export type UserUpdateOneRequiredWithoutParentNestedInput = {
+    create?: Prisma.XOR<Prisma.UserCreateWithoutParentInput, Prisma.UserUncheckedCreateWithoutParentInput>;
+    connectOrCreate?: Prisma.UserCreateOrConnectWithoutParentInput;
+    upsert?: Prisma.UserUpsertWithoutParentInput;
+    connect?: Prisma.UserWhereUniqueInput;
+    update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutParentInput, Prisma.UserUpdateWithoutParentInput>, Prisma.UserUncheckedUpdateWithoutParentInput>;
+};
+export type UserCreateNestedOneWithoutSentNotificationsInput = {
+    create?: Prisma.XOR<Prisma.UserCreateWithoutSentNotificationsInput, Prisma.UserUncheckedCreateWithoutSentNotificationsInput>;
+    connectOrCreate?: Prisma.UserCreateOrConnectWithoutSentNotificationsInput;
+    connect?: Prisma.UserWhereUniqueInput;
+};
+export type UserCreateNestedOneWithoutReceivedNotificationsInput = {
+    create?: Prisma.XOR<Prisma.UserCreateWithoutReceivedNotificationsInput, Prisma.UserUncheckedCreateWithoutReceivedNotificationsInput>;
+    connectOrCreate?: Prisma.UserCreateOrConnectWithoutReceivedNotificationsInput;
+    connect?: Prisma.UserWhereUniqueInput;
+};
+export type UserUpdateOneRequiredWithoutSentNotificationsNestedInput = {
+    create?: Prisma.XOR<Prisma.UserCreateWithoutSentNotificationsInput, Prisma.UserUncheckedCreateWithoutSentNotificationsInput>;
+    connectOrCreate?: Prisma.UserCreateOrConnectWithoutSentNotificationsInput;
+    upsert?: Prisma.UserUpsertWithoutSentNotificationsInput;
+    connect?: Prisma.UserWhereUniqueInput;
+    update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSentNotificationsInput, Prisma.UserUpdateWithoutSentNotificationsInput>, Prisma.UserUncheckedUpdateWithoutSentNotificationsInput>;
+};
+export type UserUpdateOneWithoutReceivedNotificationsNestedInput = {
+    create?: Prisma.XOR<Prisma.UserCreateWithoutReceivedNotificationsInput, Prisma.UserUncheckedCreateWithoutReceivedNotificationsInput>;
+    connectOrCreate?: Prisma.UserCreateOrConnectWithoutReceivedNotificationsInput;
+    upsert?: Prisma.UserUpsertWithoutReceivedNotificationsInput;
+    disconnect?: Prisma.UserWhereInput | boolean;
+    delete?: Prisma.UserWhereInput | boolean;
+    connect?: Prisma.UserWhereUniqueInput;
+    update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutReceivedNotificationsInput, Prisma.UserUpdateWithoutReceivedNotificationsInput>, Prisma.UserUncheckedUpdateWithoutReceivedNotificationsInput>;
+};
 export type UserCreateNestedManyWithoutDepartmentInput = {
     create?: Prisma.XOR<Prisma.UserCreateWithoutDepartmentInput, Prisma.UserUncheckedCreateWithoutDepartmentInput> | Prisma.UserCreateWithoutDepartmentInput[] | Prisma.UserUncheckedCreateWithoutDepartmentInput[];
     connectOrCreate?: Prisma.UserCreateOrConnectWithoutDepartmentInput | Prisma.UserCreateOrConnectWithoutDepartmentInput[];
@@ -524,6 +606,10 @@ export type UserCreateWithoutRolesInput = {
     updatedAt?: Date | string;
     department?: Prisma.DepartmentCreateNestedOneWithoutUsersInput;
     student?: Prisma.StudentCreateNestedOneWithoutUserInput;
+    teacher?: Prisma.TeacherCreateNestedOneWithoutUserInput;
+    parent?: Prisma.ParentCreateNestedOneWithoutUserInput;
+    sentNotifications?: Prisma.NotificationCreateNestedManyWithoutSenderInput;
+    receivedNotifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput;
 };
 export type UserUncheckedCreateWithoutRolesInput = {
     id?: number;
@@ -537,6 +623,10 @@ export type UserUncheckedCreateWithoutRolesInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     student?: Prisma.StudentUncheckedCreateNestedOneWithoutUserInput;
+    teacher?: Prisma.TeacherUncheckedCreateNestedOneWithoutUserInput;
+    parent?: Prisma.ParentUncheckedCreateNestedOneWithoutUserInput;
+    sentNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutSenderInput;
+    receivedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput;
 };
 export type UserCreateOrConnectWithoutRolesInput = {
     where: Prisma.UserWhereUniqueInput;
@@ -562,6 +652,10 @@ export type UserUpdateWithoutRolesInput = {
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     department?: Prisma.DepartmentUpdateOneWithoutUsersNestedInput;
     student?: Prisma.StudentUpdateOneWithoutUserNestedInput;
+    teacher?: Prisma.TeacherUpdateOneWithoutUserNestedInput;
+    parent?: Prisma.ParentUpdateOneWithoutUserNestedInput;
+    sentNotifications?: Prisma.NotificationUpdateManyWithoutSenderNestedInput;
+    receivedNotifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput;
 };
 export type UserUncheckedUpdateWithoutRolesInput = {
     id?: Prisma.IntFieldUpdateOperationsInput | number;
@@ -575,6 +669,10 @@ export type UserUncheckedUpdateWithoutRolesInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     student?: Prisma.StudentUncheckedUpdateOneWithoutUserNestedInput;
+    teacher?: Prisma.TeacherUncheckedUpdateOneWithoutUserNestedInput;
+    parent?: Prisma.ParentUncheckedUpdateOneWithoutUserNestedInput;
+    sentNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutSenderNestedInput;
+    receivedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput;
 };
 export type UserCreateWithoutStudentInput = {
     email: string;
@@ -587,6 +685,10 @@ export type UserCreateWithoutStudentInput = {
     updatedAt?: Date | string;
     department?: Prisma.DepartmentCreateNestedOneWithoutUsersInput;
     roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput;
+    teacher?: Prisma.TeacherCreateNestedOneWithoutUserInput;
+    parent?: Prisma.ParentCreateNestedOneWithoutUserInput;
+    sentNotifications?: Prisma.NotificationCreateNestedManyWithoutSenderInput;
+    receivedNotifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput;
 };
 export type UserUncheckedCreateWithoutStudentInput = {
     id?: number;
@@ -600,6 +702,10 @@ export type UserUncheckedCreateWithoutStudentInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput;
+    teacher?: Prisma.TeacherUncheckedCreateNestedOneWithoutUserInput;
+    parent?: Prisma.ParentUncheckedCreateNestedOneWithoutUserInput;
+    sentNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutSenderInput;
+    receivedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput;
 };
 export type UserCreateOrConnectWithoutStudentInput = {
     where: Prisma.UserWhereUniqueInput;
@@ -625,6 +731,10 @@ export type UserUpdateWithoutStudentInput = {
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     department?: Prisma.DepartmentUpdateOneWithoutUsersNestedInput;
     roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput;
+    teacher?: Prisma.TeacherUpdateOneWithoutUserNestedInput;
+    parent?: Prisma.ParentUpdateOneWithoutUserNestedInput;
+    sentNotifications?: Prisma.NotificationUpdateManyWithoutSenderNestedInput;
+    receivedNotifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput;
 };
 export type UserUncheckedUpdateWithoutStudentInput = {
     id?: Prisma.IntFieldUpdateOperationsInput | number;
@@ -638,6 +748,326 @@ export type UserUncheckedUpdateWithoutStudentInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput;
+    teacher?: Prisma.TeacherUncheckedUpdateOneWithoutUserNestedInput;
+    parent?: Prisma.ParentUncheckedUpdateOneWithoutUserNestedInput;
+    sentNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutSenderNestedInput;
+    receivedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput;
+};
+export type UserCreateWithoutTeacherInput = {
+    email: string;
+    passwordHash: string;
+    firstName: string;
+    lastName: string;
+    phone?: string | null;
+    isActive?: boolean;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    department?: Prisma.DepartmentCreateNestedOneWithoutUsersInput;
+    roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput;
+    student?: Prisma.StudentCreateNestedOneWithoutUserInput;
+    parent?: Prisma.ParentCreateNestedOneWithoutUserInput;
+    sentNotifications?: Prisma.NotificationCreateNestedManyWithoutSenderInput;
+    receivedNotifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput;
+};
+export type UserUncheckedCreateWithoutTeacherInput = {
+    id?: number;
+    email: string;
+    passwordHash: string;
+    firstName: string;
+    lastName: string;
+    phone?: string | null;
+    isActive?: boolean;
+    departmentId?: number | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput;
+    student?: Prisma.StudentUncheckedCreateNestedOneWithoutUserInput;
+    parent?: Prisma.ParentUncheckedCreateNestedOneWithoutUserInput;
+    sentNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutSenderInput;
+    receivedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput;
+};
+export type UserCreateOrConnectWithoutTeacherInput = {
+    where: Prisma.UserWhereUniqueInput;
+    create: Prisma.XOR<Prisma.UserCreateWithoutTeacherInput, Prisma.UserUncheckedCreateWithoutTeacherInput>;
+};
+export type UserUpsertWithoutTeacherInput = {
+    update: Prisma.XOR<Prisma.UserUpdateWithoutTeacherInput, Prisma.UserUncheckedUpdateWithoutTeacherInput>;
+    create: Prisma.XOR<Prisma.UserCreateWithoutTeacherInput, Prisma.UserUncheckedCreateWithoutTeacherInput>;
+    where?: Prisma.UserWhereInput;
+};
+export type UserUpdateToOneWithWhereWithoutTeacherInput = {
+    where?: Prisma.UserWhereInput;
+    data: Prisma.XOR<Prisma.UserUpdateWithoutTeacherInput, Prisma.UserUncheckedUpdateWithoutTeacherInput>;
+};
+export type UserUpdateWithoutTeacherInput = {
+    email?: Prisma.StringFieldUpdateOperationsInput | string;
+    passwordHash?: Prisma.StringFieldUpdateOperationsInput | string;
+    firstName?: Prisma.StringFieldUpdateOperationsInput | string;
+    lastName?: Prisma.StringFieldUpdateOperationsInput | string;
+    phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    department?: Prisma.DepartmentUpdateOneWithoutUsersNestedInput;
+    roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput;
+    student?: Prisma.StudentUpdateOneWithoutUserNestedInput;
+    parent?: Prisma.ParentUpdateOneWithoutUserNestedInput;
+    sentNotifications?: Prisma.NotificationUpdateManyWithoutSenderNestedInput;
+    receivedNotifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput;
+};
+export type UserUncheckedUpdateWithoutTeacherInput = {
+    id?: Prisma.IntFieldUpdateOperationsInput | number;
+    email?: Prisma.StringFieldUpdateOperationsInput | string;
+    passwordHash?: Prisma.StringFieldUpdateOperationsInput | string;
+    firstName?: Prisma.StringFieldUpdateOperationsInput | string;
+    lastName?: Prisma.StringFieldUpdateOperationsInput | string;
+    phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    departmentId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput;
+    student?: Prisma.StudentUncheckedUpdateOneWithoutUserNestedInput;
+    parent?: Prisma.ParentUncheckedUpdateOneWithoutUserNestedInput;
+    sentNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutSenderNestedInput;
+    receivedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput;
+};
+export type UserCreateWithoutParentInput = {
+    email: string;
+    passwordHash: string;
+    firstName: string;
+    lastName: string;
+    phone?: string | null;
+    isActive?: boolean;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    department?: Prisma.DepartmentCreateNestedOneWithoutUsersInput;
+    roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput;
+    student?: Prisma.StudentCreateNestedOneWithoutUserInput;
+    teacher?: Prisma.TeacherCreateNestedOneWithoutUserInput;
+    sentNotifications?: Prisma.NotificationCreateNestedManyWithoutSenderInput;
+    receivedNotifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput;
+};
+export type UserUncheckedCreateWithoutParentInput = {
+    id?: number;
+    email: string;
+    passwordHash: string;
+    firstName: string;
+    lastName: string;
+    phone?: string | null;
+    isActive?: boolean;
+    departmentId?: number | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput;
+    student?: Prisma.StudentUncheckedCreateNestedOneWithoutUserInput;
+    teacher?: Prisma.TeacherUncheckedCreateNestedOneWithoutUserInput;
+    sentNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutSenderInput;
+    receivedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput;
+};
+export type UserCreateOrConnectWithoutParentInput = {
+    where: Prisma.UserWhereUniqueInput;
+    create: Prisma.XOR<Prisma.UserCreateWithoutParentInput, Prisma.UserUncheckedCreateWithoutParentInput>;
+};
+export type UserUpsertWithoutParentInput = {
+    update: Prisma.XOR<Prisma.UserUpdateWithoutParentInput, Prisma.UserUncheckedUpdateWithoutParentInput>;
+    create: Prisma.XOR<Prisma.UserCreateWithoutParentInput, Prisma.UserUncheckedCreateWithoutParentInput>;
+    where?: Prisma.UserWhereInput;
+};
+export type UserUpdateToOneWithWhereWithoutParentInput = {
+    where?: Prisma.UserWhereInput;
+    data: Prisma.XOR<Prisma.UserUpdateWithoutParentInput, Prisma.UserUncheckedUpdateWithoutParentInput>;
+};
+export type UserUpdateWithoutParentInput = {
+    email?: Prisma.StringFieldUpdateOperationsInput | string;
+    passwordHash?: Prisma.StringFieldUpdateOperationsInput | string;
+    firstName?: Prisma.StringFieldUpdateOperationsInput | string;
+    lastName?: Prisma.StringFieldUpdateOperationsInput | string;
+    phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    department?: Prisma.DepartmentUpdateOneWithoutUsersNestedInput;
+    roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput;
+    student?: Prisma.StudentUpdateOneWithoutUserNestedInput;
+    teacher?: Prisma.TeacherUpdateOneWithoutUserNestedInput;
+    sentNotifications?: Prisma.NotificationUpdateManyWithoutSenderNestedInput;
+    receivedNotifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput;
+};
+export type UserUncheckedUpdateWithoutParentInput = {
+    id?: Prisma.IntFieldUpdateOperationsInput | number;
+    email?: Prisma.StringFieldUpdateOperationsInput | string;
+    passwordHash?: Prisma.StringFieldUpdateOperationsInput | string;
+    firstName?: Prisma.StringFieldUpdateOperationsInput | string;
+    lastName?: Prisma.StringFieldUpdateOperationsInput | string;
+    phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    departmentId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput;
+    student?: Prisma.StudentUncheckedUpdateOneWithoutUserNestedInput;
+    teacher?: Prisma.TeacherUncheckedUpdateOneWithoutUserNestedInput;
+    sentNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutSenderNestedInput;
+    receivedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput;
+};
+export type UserCreateWithoutSentNotificationsInput = {
+    email: string;
+    passwordHash: string;
+    firstName: string;
+    lastName: string;
+    phone?: string | null;
+    isActive?: boolean;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    department?: Prisma.DepartmentCreateNestedOneWithoutUsersInput;
+    roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput;
+    student?: Prisma.StudentCreateNestedOneWithoutUserInput;
+    teacher?: Prisma.TeacherCreateNestedOneWithoutUserInput;
+    parent?: Prisma.ParentCreateNestedOneWithoutUserInput;
+    receivedNotifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput;
+};
+export type UserUncheckedCreateWithoutSentNotificationsInput = {
+    id?: number;
+    email: string;
+    passwordHash: string;
+    firstName: string;
+    lastName: string;
+    phone?: string | null;
+    isActive?: boolean;
+    departmentId?: number | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput;
+    student?: Prisma.StudentUncheckedCreateNestedOneWithoutUserInput;
+    teacher?: Prisma.TeacherUncheckedCreateNestedOneWithoutUserInput;
+    parent?: Prisma.ParentUncheckedCreateNestedOneWithoutUserInput;
+    receivedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput;
+};
+export type UserCreateOrConnectWithoutSentNotificationsInput = {
+    where: Prisma.UserWhereUniqueInput;
+    create: Prisma.XOR<Prisma.UserCreateWithoutSentNotificationsInput, Prisma.UserUncheckedCreateWithoutSentNotificationsInput>;
+};
+export type UserCreateWithoutReceivedNotificationsInput = {
+    email: string;
+    passwordHash: string;
+    firstName: string;
+    lastName: string;
+    phone?: string | null;
+    isActive?: boolean;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    department?: Prisma.DepartmentCreateNestedOneWithoutUsersInput;
+    roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput;
+    student?: Prisma.StudentCreateNestedOneWithoutUserInput;
+    teacher?: Prisma.TeacherCreateNestedOneWithoutUserInput;
+    parent?: Prisma.ParentCreateNestedOneWithoutUserInput;
+    sentNotifications?: Prisma.NotificationCreateNestedManyWithoutSenderInput;
+};
+export type UserUncheckedCreateWithoutReceivedNotificationsInput = {
+    id?: number;
+    email: string;
+    passwordHash: string;
+    firstName: string;
+    lastName: string;
+    phone?: string | null;
+    isActive?: boolean;
+    departmentId?: number | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput;
+    student?: Prisma.StudentUncheckedCreateNestedOneWithoutUserInput;
+    teacher?: Prisma.TeacherUncheckedCreateNestedOneWithoutUserInput;
+    parent?: Prisma.ParentUncheckedCreateNestedOneWithoutUserInput;
+    sentNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutSenderInput;
+};
+export type UserCreateOrConnectWithoutReceivedNotificationsInput = {
+    where: Prisma.UserWhereUniqueInput;
+    create: Prisma.XOR<Prisma.UserCreateWithoutReceivedNotificationsInput, Prisma.UserUncheckedCreateWithoutReceivedNotificationsInput>;
+};
+export type UserUpsertWithoutSentNotificationsInput = {
+    update: Prisma.XOR<Prisma.UserUpdateWithoutSentNotificationsInput, Prisma.UserUncheckedUpdateWithoutSentNotificationsInput>;
+    create: Prisma.XOR<Prisma.UserCreateWithoutSentNotificationsInput, Prisma.UserUncheckedCreateWithoutSentNotificationsInput>;
+    where?: Prisma.UserWhereInput;
+};
+export type UserUpdateToOneWithWhereWithoutSentNotificationsInput = {
+    where?: Prisma.UserWhereInput;
+    data: Prisma.XOR<Prisma.UserUpdateWithoutSentNotificationsInput, Prisma.UserUncheckedUpdateWithoutSentNotificationsInput>;
+};
+export type UserUpdateWithoutSentNotificationsInput = {
+    email?: Prisma.StringFieldUpdateOperationsInput | string;
+    passwordHash?: Prisma.StringFieldUpdateOperationsInput | string;
+    firstName?: Prisma.StringFieldUpdateOperationsInput | string;
+    lastName?: Prisma.StringFieldUpdateOperationsInput | string;
+    phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    department?: Prisma.DepartmentUpdateOneWithoutUsersNestedInput;
+    roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput;
+    student?: Prisma.StudentUpdateOneWithoutUserNestedInput;
+    teacher?: Prisma.TeacherUpdateOneWithoutUserNestedInput;
+    parent?: Prisma.ParentUpdateOneWithoutUserNestedInput;
+    receivedNotifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput;
+};
+export type UserUncheckedUpdateWithoutSentNotificationsInput = {
+    id?: Prisma.IntFieldUpdateOperationsInput | number;
+    email?: Prisma.StringFieldUpdateOperationsInput | string;
+    passwordHash?: Prisma.StringFieldUpdateOperationsInput | string;
+    firstName?: Prisma.StringFieldUpdateOperationsInput | string;
+    lastName?: Prisma.StringFieldUpdateOperationsInput | string;
+    phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    departmentId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput;
+    student?: Prisma.StudentUncheckedUpdateOneWithoutUserNestedInput;
+    teacher?: Prisma.TeacherUncheckedUpdateOneWithoutUserNestedInput;
+    parent?: Prisma.ParentUncheckedUpdateOneWithoutUserNestedInput;
+    receivedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput;
+};
+export type UserUpsertWithoutReceivedNotificationsInput = {
+    update: Prisma.XOR<Prisma.UserUpdateWithoutReceivedNotificationsInput, Prisma.UserUncheckedUpdateWithoutReceivedNotificationsInput>;
+    create: Prisma.XOR<Prisma.UserCreateWithoutReceivedNotificationsInput, Prisma.UserUncheckedCreateWithoutReceivedNotificationsInput>;
+    where?: Prisma.UserWhereInput;
+};
+export type UserUpdateToOneWithWhereWithoutReceivedNotificationsInput = {
+    where?: Prisma.UserWhereInput;
+    data: Prisma.XOR<Prisma.UserUpdateWithoutReceivedNotificationsInput, Prisma.UserUncheckedUpdateWithoutReceivedNotificationsInput>;
+};
+export type UserUpdateWithoutReceivedNotificationsInput = {
+    email?: Prisma.StringFieldUpdateOperationsInput | string;
+    passwordHash?: Prisma.StringFieldUpdateOperationsInput | string;
+    firstName?: Prisma.StringFieldUpdateOperationsInput | string;
+    lastName?: Prisma.StringFieldUpdateOperationsInput | string;
+    phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    department?: Prisma.DepartmentUpdateOneWithoutUsersNestedInput;
+    roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput;
+    student?: Prisma.StudentUpdateOneWithoutUserNestedInput;
+    teacher?: Prisma.TeacherUpdateOneWithoutUserNestedInput;
+    parent?: Prisma.ParentUpdateOneWithoutUserNestedInput;
+    sentNotifications?: Prisma.NotificationUpdateManyWithoutSenderNestedInput;
+};
+export type UserUncheckedUpdateWithoutReceivedNotificationsInput = {
+    id?: Prisma.IntFieldUpdateOperationsInput | number;
+    email?: Prisma.StringFieldUpdateOperationsInput | string;
+    passwordHash?: Prisma.StringFieldUpdateOperationsInput | string;
+    firstName?: Prisma.StringFieldUpdateOperationsInput | string;
+    lastName?: Prisma.StringFieldUpdateOperationsInput | string;
+    phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    departmentId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput;
+    student?: Prisma.StudentUncheckedUpdateOneWithoutUserNestedInput;
+    teacher?: Prisma.TeacherUncheckedUpdateOneWithoutUserNestedInput;
+    parent?: Prisma.ParentUncheckedUpdateOneWithoutUserNestedInput;
+    sentNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutSenderNestedInput;
 };
 export type UserCreateWithoutDepartmentInput = {
     email: string;
@@ -650,6 +1080,10 @@ export type UserCreateWithoutDepartmentInput = {
     updatedAt?: Date | string;
     roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput;
     student?: Prisma.StudentCreateNestedOneWithoutUserInput;
+    teacher?: Prisma.TeacherCreateNestedOneWithoutUserInput;
+    parent?: Prisma.ParentCreateNestedOneWithoutUserInput;
+    sentNotifications?: Prisma.NotificationCreateNestedManyWithoutSenderInput;
+    receivedNotifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput;
 };
 export type UserUncheckedCreateWithoutDepartmentInput = {
     id?: number;
@@ -663,6 +1097,10 @@ export type UserUncheckedCreateWithoutDepartmentInput = {
     updatedAt?: Date | string;
     roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput;
     student?: Prisma.StudentUncheckedCreateNestedOneWithoutUserInput;
+    teacher?: Prisma.TeacherUncheckedCreateNestedOneWithoutUserInput;
+    parent?: Prisma.ParentUncheckedCreateNestedOneWithoutUserInput;
+    sentNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutSenderInput;
+    receivedNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput;
 };
 export type UserCreateOrConnectWithoutDepartmentInput = {
     where: Prisma.UserWhereUniqueInput;
@@ -722,6 +1160,10 @@ export type UserUpdateWithoutDepartmentInput = {
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput;
     student?: Prisma.StudentUpdateOneWithoutUserNestedInput;
+    teacher?: Prisma.TeacherUpdateOneWithoutUserNestedInput;
+    parent?: Prisma.ParentUpdateOneWithoutUserNestedInput;
+    sentNotifications?: Prisma.NotificationUpdateManyWithoutSenderNestedInput;
+    receivedNotifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput;
 };
 export type UserUncheckedUpdateWithoutDepartmentInput = {
     id?: Prisma.IntFieldUpdateOperationsInput | number;
@@ -735,6 +1177,10 @@ export type UserUncheckedUpdateWithoutDepartmentInput = {
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput;
     student?: Prisma.StudentUncheckedUpdateOneWithoutUserNestedInput;
+    teacher?: Prisma.TeacherUncheckedUpdateOneWithoutUserNestedInput;
+    parent?: Prisma.ParentUncheckedUpdateOneWithoutUserNestedInput;
+    sentNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutSenderNestedInput;
+    receivedNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput;
 };
 export type UserUncheckedUpdateManyWithoutDepartmentInput = {
     id?: Prisma.IntFieldUpdateOperationsInput | number;
@@ -752,9 +1198,13 @@ export type UserUncheckedUpdateManyWithoutDepartmentInput = {
  */
 export type UserCountOutputType = {
     roles: number;
+    sentNotifications: number;
+    receivedNotifications: number;
 };
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     roles?: boolean | UserCountOutputTypeCountRolesArgs;
+    sentNotifications?: boolean | UserCountOutputTypeCountSentNotificationsArgs;
+    receivedNotifications?: boolean | UserCountOutputTypeCountReceivedNotificationsArgs;
 };
 /**
  * UserCountOutputType without action
@@ -771,6 +1221,18 @@ export type UserCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensi
 export type UserCountOutputTypeCountRolesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     where?: Prisma.UserRoleWhereInput;
 };
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountSentNotificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    where?: Prisma.NotificationWhereInput;
+};
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountReceivedNotificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    where?: Prisma.NotificationWhereInput;
+};
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
     id?: boolean;
     email?: boolean;
@@ -785,6 +1247,10 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
     department?: boolean | Prisma.User$departmentArgs<ExtArgs>;
     roles?: boolean | Prisma.User$rolesArgs<ExtArgs>;
     student?: boolean | Prisma.User$studentArgs<ExtArgs>;
+    teacher?: boolean | Prisma.User$teacherArgs<ExtArgs>;
+    parent?: boolean | Prisma.User$parentArgs<ExtArgs>;
+    sentNotifications?: boolean | Prisma.User$sentNotificationsArgs<ExtArgs>;
+    receivedNotifications?: boolean | Prisma.User$receivedNotificationsArgs<ExtArgs>;
     _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>;
 }, ExtArgs["result"]["user"]>;
 export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -830,6 +1296,10 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
     department?: boolean | Prisma.User$departmentArgs<ExtArgs>;
     roles?: boolean | Prisma.User$rolesArgs<ExtArgs>;
     student?: boolean | Prisma.User$studentArgs<ExtArgs>;
+    teacher?: boolean | Prisma.User$teacherArgs<ExtArgs>;
+    parent?: boolean | Prisma.User$parentArgs<ExtArgs>;
+    sentNotifications?: boolean | Prisma.User$sentNotificationsArgs<ExtArgs>;
+    receivedNotifications?: boolean | Prisma.User$receivedNotificationsArgs<ExtArgs>;
     _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>;
 };
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -844,6 +1314,10 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
         department: Prisma.$DepartmentPayload<ExtArgs> | null;
         roles: Prisma.$UserRolePayload<ExtArgs>[];
         student: Prisma.$StudentPayload<ExtArgs> | null;
+        teacher: Prisma.$TeacherPayload<ExtArgs> | null;
+        parent: Prisma.$ParentPayload<ExtArgs> | null;
+        sentNotifications: Prisma.$NotificationPayload<ExtArgs>[];
+        receivedNotifications: Prisma.$NotificationPayload<ExtArgs>[];
     };
     scalars: runtime.Types.Extensions.GetPayloadResult<{
         id: number;
@@ -1188,6 +1662,10 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
     department<T extends Prisma.User$departmentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$departmentArgs<ExtArgs>>): Prisma.Prisma__DepartmentClient<runtime.Types.Result.GetResult<Prisma.$DepartmentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
     roles<T extends Prisma.User$rolesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$rolesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserRolePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
     student<T extends Prisma.User$studentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$studentArgs<ExtArgs>>): Prisma.Prisma__StudentClient<runtime.Types.Result.GetResult<Prisma.$StudentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
+    teacher<T extends Prisma.User$teacherArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$teacherArgs<ExtArgs>>): Prisma.Prisma__TeacherClient<runtime.Types.Result.GetResult<Prisma.$TeacherPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
+    parent<T extends Prisma.User$parentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$parentArgs<ExtArgs>>): Prisma.Prisma__ParentClient<runtime.Types.Result.GetResult<Prisma.$ParentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
+    sentNotifications<T extends Prisma.User$sentNotificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$sentNotificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
+    receivedNotifications<T extends Prisma.User$receivedNotificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$receivedNotificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1659,6 +2137,88 @@ export type User$studentArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
      */
     include?: Prisma.StudentInclude<ExtArgs> | null;
     where?: Prisma.StudentWhereInput;
+};
+/**
+ * User.teacher
+ */
+export type User$teacherArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Teacher
+     */
+    select?: Prisma.TeacherSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the Teacher
+     */
+    omit?: Prisma.TeacherOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.TeacherInclude<ExtArgs> | null;
+    where?: Prisma.TeacherWhereInput;
+};
+/**
+ * User.parent
+ */
+export type User$parentArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Parent
+     */
+    select?: Prisma.ParentSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the Parent
+     */
+    omit?: Prisma.ParentOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.ParentInclude<ExtArgs> | null;
+    where?: Prisma.ParentWhereInput;
+};
+/**
+ * User.sentNotifications
+ */
+export type User$sentNotificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Notification
+     */
+    select?: Prisma.NotificationSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the Notification
+     */
+    omit?: Prisma.NotificationOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.NotificationInclude<ExtArgs> | null;
+    where?: Prisma.NotificationWhereInput;
+    orderBy?: Prisma.NotificationOrderByWithRelationInput | Prisma.NotificationOrderByWithRelationInput[];
+    cursor?: Prisma.NotificationWhereUniqueInput;
+    take?: number;
+    skip?: number;
+    distinct?: Prisma.NotificationScalarFieldEnum | Prisma.NotificationScalarFieldEnum[];
+};
+/**
+ * User.receivedNotifications
+ */
+export type User$receivedNotificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Notification
+     */
+    select?: Prisma.NotificationSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the Notification
+     */
+    omit?: Prisma.NotificationOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.NotificationInclude<ExtArgs> | null;
+    where?: Prisma.NotificationWhereInput;
+    orderBy?: Prisma.NotificationOrderByWithRelationInput | Prisma.NotificationOrderByWithRelationInput[];
+    cursor?: Prisma.NotificationWhereUniqueInput;
+    take?: number;
+    skip?: number;
+    distinct?: Prisma.NotificationScalarFieldEnum | Prisma.NotificationScalarFieldEnum[];
 };
 /**
  * User without action

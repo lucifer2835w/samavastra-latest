@@ -1,161 +1,149 @@
-import { prisma } from '../../../config/db';
-import { Prisma } from '../../../generated/prisma/client';
-export class InventoryService {
-    /**
-     * Get all inventory with pagination
-     */
-    async getAllInventory(page: number = 1, limit: number = 20, lowStock: boolean = false) {
-        const skip = (page - 1) * limit;
-        const where: any = {};
+import { db } from '../../../config/firebase';
 
-        if (lowStock) {
-            where.quantityOnHand = {
-                lte: prisma.inventory.fields.reorderLevel,
-            };
+export class InventoryService {
+    async getAllInventory(page: number = 1, limit: number = 20, lowStock: boolean = false) {
+        const snap = await db.collection('inventory').get();
+        let allInventory: any[] = [];
+
+        for (const doc of snap.docs) {
+            const inv = { id: doc.id, ...doc.data() } as any;
+
+            // Fetch product
+            if (inv.productId) {
+                const productDoc = await db.collection('products').doc(inv.productId).get();
+                inv.product = productDoc.exists ? { id: productDoc.id, ...productDoc.data() } : null;
+            }
+
+            if (lowStock) {
+                if (inv.quantityOnHand <= inv.reorderLevel) {
+                    allInventory.push(inv);
+                }
+            } else {
+                allInventory.push(inv);
+            }
         }
 
-        const [inventory, total] = await Promise.all([
-            prisma.inventory.findMany({
-                skip,
-                take: limit,
-                where,
-                include: {
-                    product: true,
-                },
-                orderBy: {
-                    product: {
-                        name: 'asc',
-                    },
-                },
-            }),
-            prisma.inventory.count({ where }),
-        ]);
+        // Sort by product name
+        allInventory.sort((a, b) => {
+            const aName = a.product?.name || '';
+            const bName = b.product?.name || '';
+            return aName.localeCompare(bName);
+        });
+
+        const total = allInventory.length;
+        const start = (page - 1) * limit;
+        const inventory = allInventory.slice(start, start + limit);
 
         return {
             inventory,
-            pagination: {
-                page,
-                limit,
-                total,
-                totalPages: Math.ceil(total / limit),
-            },
+            pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
         };
     }
 
-    /**
-     * Get inventory for a specific product
-     */
-    async getInventoryByProductId(productId: number) {
-        return await prisma.inventory.findUnique({
-            where: { productId },
-            include: {
-                product: true,
-            },
-        });
+    async getInventoryByProductId(productId: string) {
+        const snap = await db.collection('inventory').where('productId', '==', productId).limit(1).get();
+        if (snap.empty) return null;
+
+        const doc = snap.docs[0];
+        const inv = { id: doc.id, ...doc.data() } as any;
+
+        const productDoc = await db.collection('products').doc(productId).get();
+        inv.product = productDoc.exists ? { id: productDoc.id, ...productDoc.data() } : null;
+
+        return inv;
     }
 
-    /**
-     * Update inventory levels
-     */
     async updateInventory(
-        productId: number,
+        productId: string,
         data: {
             quantityOnHand?: number;
             reorderLevel?: number;
             location?: string;
         }
     ) {
-        return await prisma.inventory.update({
-            where: { productId },
-            data,
-            include: {
-                product: true,
-            },
-        });
+        const snap = await db.collection('inventory').where('productId', '==', productId).limit(1).get();
+        if (snap.empty) throw new Error('Inventory not found for this product');
+
+        const docRef = snap.docs[0].ref;
+        const updateData: any = {};
+        if (data.quantityOnHand !== undefined) updateData.quantityOnHand = data.quantityOnHand;
+        if (data.reorderLevel !== undefined) updateData.reorderLevel = data.reorderLevel;
+        if (data.location !== undefined) updateData.location = data.location;
+
+        await docRef.update(updateData);
+        const updated = await docRef.get();
+        const inv = { id: updated.id, ...updated.data() } as any;
+
+        const productDoc = await db.collection('products').doc(productId).get();
+        inv.product = productDoc.exists ? { id: productDoc.id, ...productDoc.data() } : null;
+
+        return inv;
     }
 
-    /**
-     * Adjust inventory (add or remove stock)
-     */
-    async adjustInventory(productId: number, adjustment: number, notes?: string) {
-        const inventory = await prisma.inventory.findUnique({
-            where: { productId },
-            include: { product: true },
-        });
+    async adjustInventory(productId: string, adjustment: number, notes?: string) {
+        const snap = await db.collection('inventory').where('productId', '==', productId).limit(1).get();
+        if (snap.empty) throw new Error('Inventory not found for this product');
 
-        if (!inventory) {
-            throw new Error('Inventory not found for this product');
-        }
-
-        const newQuantity = inventory.quantityOnHand + adjustment;
+        const doc = snap.docs[0];
+        const inv = doc.data();
+        const newQuantity = (inv.quantityOnHand || 0) + adjustment;
 
         if (newQuantity < 0) {
             throw new Error('Insufficient inventory. Cannot reduce below zero.');
         }
 
-        return await prisma.inventory.update({
-            where: { productId },
-            data: {
-                quantityOnHand: newQuantity,
-            },
-            include: {
-                product: true,
-            },
-        });
+        await doc.ref.update({ quantityOnHand: newQuantity });
+        const updated = await doc.ref.get();
+        const result = { id: updated.id, ...updated.data() } as any;
+
+        const productDoc = await db.collection('products').doc(productId).get();
+        result.product = productDoc.exists ? { id: productDoc.id, ...productDoc.data() } : null;
+
+        return result;
     }
 
-    /**
-     * Get low stock items
-     */
     async getLowStockItems() {
-        const items = await prisma.inventory.findMany({
-            where: {
-                quantityOnHand: {
-                    lte: prisma.inventory.fields.reorderLevel,
-                },
-            },
-            include: {
-                product: true,
-            },
-            orderBy: {
-                quantityOnHand: 'asc',
-            },
-        });
+        const snap = await db.collection('inventory').get();
+        const items: any[] = [];
 
+        for (const doc of snap.docs) {
+            const inv = doc.data();
+            if (inv.quantityOnHand <= inv.reorderLevel) {
+                const item = { id: doc.id, ...inv } as any;
+                const productDoc = await db.collection('products').doc(inv.productId).get();
+                item.product = productDoc.exists ? { id: productDoc.id, ...productDoc.data() } : null;
+                items.push(item);
+            }
+        }
+
+        items.sort((a, b) => (a.quantityOnHand || 0) - (b.quantityOnHand || 0));
         return items;
     }
 
-    /**
-     * Get inventory statistics
-     */
     async getInventoryStats() {
-        const [totalProducts, lowStockCount, outOfStock] = await Promise.all([
-            prisma.inventory.count(),
-            prisma.inventory.count({
-                where: {
-                    quantityOnHand: {
-                        lte: prisma.inventory.fields.reorderLevel,
-                    },
-                },
-            }),
-            prisma.inventory.count({
-                where: {
-                    quantityOnHand: 0,
-                },
-            }),
-        ]);
+        const snap = await db.collection('inventory').get();
+        let totalProducts = 0;
+        let lowStockCount = 0;
+        let outOfStock = 0;
+        let totalValue = 0;
 
-        const totalValue = await prisma.$queryRaw<Array<{ total: number }>>`
-      SELECT SUM(i."quantityOnHand" * p.price::numeric) as total
-      FROM "Inventory" i
-      JOIN "Product" p ON i."productId" = p.id
-    `;
+        for (const doc of snap.docs) {
+            const inv = doc.data();
+            totalProducts++;
 
-        return {
-            totalProducts,
-            lowStockCount,
-            outOfStock,
-            totalValue: totalValue[0]?.total || 0,
-        };
+            if (inv.quantityOnHand <= inv.reorderLevel) lowStockCount++;
+            if (inv.quantityOnHand === 0) outOfStock++;
+
+            // Calculate total value
+            if (inv.productId) {
+                const productDoc = await db.collection('products').doc(inv.productId).get();
+                if (productDoc.exists) {
+                    const price = Number(productDoc.data()!.price || 0);
+                    totalValue += inv.quantityOnHand * price;
+                }
+            }
+        }
+
+        return { totalProducts, lowStockCount, outOfStock, totalValue };
     }
 }

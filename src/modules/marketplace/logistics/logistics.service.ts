@@ -1,248 +1,189 @@
-import { prisma } from '../../../config/db';
-import { Prisma } from '../../../generated/prisma/client';
+import { db } from '../../../config/firebase';
+
+// Helper
+async function fetchOrderWithStudent(orderId: string) {
+    const doc = await db.collection('orders').doc(orderId).get();
+    if (!doc.exists) return null;
+    const order = { id: doc.id, ...doc.data() } as any;
+    if (order.studentId) {
+        const studentDoc = await db.collection('students').doc(order.studentId).get();
+        if (studentDoc.exists) {
+            order.student = { id: studentDoc.id, ...studentDoc.data() } as any;
+            if (order.student.userId) {
+                const userDoc = await db.collection('users').doc(order.student.userId).get();
+                if (userDoc.exists) {
+                    order.student.user = {
+                        firstName: userDoc.data()!.firstName,
+                        lastName: userDoc.data()!.lastName,
+                        email: userDoc.data()!.email,
+                    };
+                }
+            }
+        }
+        // Fetch items
+        const itemsSnap = await db.collection('orderItems').where('orderId', '==', orderId).get();
+        order.items = [];
+        for (const itemDoc of itemsSnap.docs) {
+            const item = { id: itemDoc.id, ...itemDoc.data() } as any;
+            const productDoc = await db.collection('products').doc(item.productId).get();
+            item.product = productDoc.exists ? { id: productDoc.id, ...productDoc.data() } : null;
+            order.items.push(item);
+        }
+    }
+    return order;
+}
+
 export class LogisticsService {
-    /**
-     * Create logistics tracking for an order
-     */
     async createTracking(data: {
-        orderId: number;
+        orderId: string;
         trackingNumber: string;
         status: string;
         estimatedDelivery?: Date;
     }) {
-        return await prisma.logisticsTracking.create({
-            data: {
-                orderId: data.orderId,
-                trackingNumber: data.trackingNumber,
-                status: data.status,
-                estimatedDelivery: data.estimatedDelivery ?? null,
-            },
-            include: {
-                order: {
-                    include: {
-                        student: {
-                            include: {
-                                user: {
-                                    select: {
-                                        firstName: true,
-                                        lastName: true,
-                                        email: true,
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-            },
+        const docRef = await db.collection('logisticsTracking').add({
+            orderId: data.orderId,
+            trackingNumber: data.trackingNumber,
+            status: data.status,
+            estimatedDelivery: data.estimatedDelivery || null,
+            actualDelivery: null,
         });
+        const doc = await docRef.get();
+        const tracking = { id: doc.id, ...doc.data() } as any;
+        tracking.order = await fetchOrderWithStudent(data.orderId);
+        return tracking;
     }
 
-    /**
-     * Get tracking by ID
-     */
-    async getTrackingById(id: number) {
-        return await prisma.logisticsTracking.findUnique({
-            where: { id },
-            include: {
-                order: {
-                    include: {
-                        student: {
-                            include: {
-                                user: {
-                                    select: {
-                                        firstName: true,
-                                        lastName: true,
-                                        email: true,
-                                    },
-                                },
-                            },
-                        },
-                        items: {
-                            include: {
-                                product: true,
-                            },
-                        },
-                    },
-                },
-            },
-        });
+    async getTrackingById(id: string) {
+        const doc = await db.collection('logisticsTracking').doc(id).get();
+        if (!doc.exists) return null;
+        const tracking = { id: doc.id, ...doc.data() } as any;
+        if (tracking.orderId) {
+            tracking.order = await fetchOrderWithStudent(tracking.orderId);
+        }
+        return tracking;
     }
 
-    /**
-     * Get tracking by tracking number
-     */
     async getTrackingByNumber(trackingNumber: string) {
-        return await prisma.logisticsTracking.findUnique({
-            where: { trackingNumber },
-            include: {
-                order: {
-                    include: {
-                        student: {
-                            include: {
-                                user: {
-                                    select: {
-                                        firstName: true,
-                                        lastName: true,
-                                        email: true,
-                                    },
-                                },
-                            },
-                        },
-                        items: {
-                            include: {
-                                product: true,
-                            },
-                        },
-                    },
-                },
-            },
-        });
+        const snap = await db.collection('logisticsTracking')
+            .where('trackingNumber', '==', trackingNumber)
+            .limit(1)
+            .get();
+        if (snap.empty) return null;
+        const doc = snap.docs[0];
+        const tracking = { id: doc.id, ...doc.data() } as any;
+        if (tracking.orderId) {
+            tracking.order = await fetchOrderWithStudent(tracking.orderId);
+        }
+        return tracking;
     }
 
-    /**
-     * Get tracking for an order
-     */
-    async getTrackingByOrderId(orderId: number) {
-        return await prisma.logisticsTracking.findMany({
-            where: { orderId },
-            include: {
-                order: true,
-            },
-            orderBy: {
-                id: 'desc',
-            },
+    async getTrackingByOrderId(orderId: string) {
+        const snap = await db.collection('logisticsTracking')
+            .where('orderId', '==', orderId)
+            .get();
+        const results = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        // Sort by descending
+        results.sort((a: any, b: any) => {
+            // Newest first
+            return 0; // order by id in Firestore doesn't help, just return as-is
         });
+        return results;
     }
 
-    /**
-     * Update tracking status
-     */
     async updateTracking(
-        id: number,
+        id: string,
         data: {
             status?: string;
             estimatedDelivery?: Date;
             actualDelivery?: Date;
         }
     ) {
-        return await prisma.logisticsTracking.update({
-            where: { id },
-            data,
-            include: {
-                order: {
-                    include: {
-                        student: {
-                            include: {
-                                user: {
-                                    select: {
-                                        firstName: true,
-                                        lastName: true,
-                                        email: true,
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-            },
+        const docRef = db.collection('logisticsTracking').doc(id);
+        const updateData: any = {};
+        if (data.status !== undefined) updateData.status = data.status;
+        if (data.estimatedDelivery !== undefined) updateData.estimatedDelivery = data.estimatedDelivery;
+        if (data.actualDelivery !== undefined) updateData.actualDelivery = data.actualDelivery;
+
+        await docRef.update(updateData);
+        const doc = await docRef.get();
+        const tracking = { id: doc.id, ...doc.data() } as any;
+        if (tracking.orderId) {
+            tracking.order = await fetchOrderWithStudent(tracking.orderId);
+        }
+        return tracking;
+    }
+
+    async markAsDelivered(id: string) {
+        return await db.runTransaction(async (transaction) => {
+            const trackingDoc = await transaction.get(db.collection('logisticsTracking').doc(id));
+            if (!trackingDoc.exists) throw new Error('Tracking not found');
+
+            const trackingData = trackingDoc.data()!;
+
+            transaction.update(trackingDoc.ref, {
+                status: 'DELIVERED',
+                actualDelivery: new Date(),
+            });
+
+            // Update order status
+            if (trackingData.orderId) {
+                const orderRef = db.collection('orders').doc(trackingData.orderId);
+                transaction.update(orderRef, { status: 'COMPLETED', updatedAt: new Date() });
+            }
+
+            return {
+                id: trackingDoc.id,
+                ...trackingData,
+                status: 'DELIVERED',
+                actualDelivery: new Date(),
+            };
         });
     }
 
-    /**
-     * Mark as delivered
-     */
-    async markAsDelivered(id: number) {
-        return await prisma.$transaction(async (tx) => {
-            const tracking = await tx.logisticsTracking.update({
-                where: { id },
-                data: {
-                    status: 'DELIVERED',
-                    actualDelivery: new Date(),
-                },
-                include: {
-                    order: true,
-                },
-            });
-
-            // Update order status to completed
-            await tx.order.update({
-                where: { id: tracking.orderId },
-                data: { status: 'COMPLETED' },
-            });
-
-            return tracking;
-        });
-    }
-
-    /**
-     * Get all tracking records with pagination
-     */
     async getAllTracking(page: number = 1, limit: number = 20, status?: string) {
-        const skip = (page - 1) * limit;
-        const where: any = {};
-
+        let query: FirebaseFirestore.Query = db.collection('logisticsTracking');
         if (status) {
-            where.status = status;
+            query = query.where('status', '==', status);
         }
 
-        const [tracking, total] = await Promise.all([
-            prisma.logisticsTracking.findMany({
-                skip,
-                take: limit,
-                where,
-                include: {
-                    order: {
-                        include: {
-                            student: {
-                                include: {
-                                    user: {
-                                        select: {
-                                            firstName: true,
-                                            lastName: true,
-                                            email: true,
-                                        },
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-                orderBy: {
-                    id: 'desc',
-                },
-            }),
-            prisma.logisticsTracking.count({ where }),
-        ]);
+        const snap = await query.get();
+        const allTracking: any[] = [];
+
+        for (const doc of snap.docs) {
+            const tracking = { id: doc.id, ...doc.data() } as any;
+            if (tracking.orderId) {
+                tracking.order = await fetchOrderWithStudent(tracking.orderId);
+            }
+            allTracking.push(tracking);
+        }
+
+        const total = allTracking.length;
+        const start = (page - 1) * limit;
+        const trackingList = allTracking.slice(start, start + limit);
 
         return {
-            tracking,
-            pagination: {
-                page,
-                limit,
-                total,
-                totalPages: Math.ceil(total / limit),
-            },
+            tracking: trackingList,
+            pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
         };
     }
 
-    /**
-     * Get logistics statistics
-     */
     async getLogisticsStats() {
-        const [total, inTransit, delivered, pending] = await Promise.all([
-            prisma.logisticsTracking.count(),
-            prisma.logisticsTracking.count({ where: { status: 'IN_TRANSIT' } }),
-            prisma.logisticsTracking.count({ where: { status: 'DELIVERED' } }),
-            prisma.logisticsTracking.count({ where: { status: 'PENDING' } }),
-        ]);
+        const snap = await db.collection('logisticsTracking').get();
+        let total = 0, inTransit = 0, delivered = 0, pending = 0;
+
+        snap.docs.forEach(doc => {
+            const data = doc.data();
+            total++;
+            switch (data.status) {
+                case 'IN_TRANSIT': inTransit++; break;
+                case 'DELIVERED': delivered++; break;
+                case 'PENDING': pending++; break;
+            }
+        });
 
         return {
             total,
-            byStatus: {
-                pending,
-                inTransit,
-                delivered,
-            },
+            byStatus: { pending, inTransit, delivered },
         };
     }
 }

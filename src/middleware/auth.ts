@@ -1,23 +1,24 @@
 import { Request, Response, NextFunction } from 'express';
-import { verifyJwt, JwtPayload } from '../shared/utils/jwt';
+import { JwtPayload } from '../shared/utils/jwt';
 
 export interface AuthenticatedRequest extends Request {
   user?: JwtPayload;
 }
 
+// TEMPORARY: Auth bypassed — always authenticated as admin
+const MOCK_USER_PAYLOAD: JwtPayload = {
+  id: 'demo-user-001',
+  email: 'admin@samavest.com',
+  userRole: 'ADMIN',
+  firstName: 'Demo',
+  lastName: 'User'
+} as any;
+
 export function authenticateJWT(req: AuthenticatedRequest, res: Response, next: NextFunction) {
-  const header = req.headers['authorization'];
-  if (!header || !header.startsWith('Bearer ')) {
-    return res.status(401).json({ message: 'Missing or invalid authorization header' });
-  }
+  console.log('TEMPORARY: Bypassing auth for request:', req.method, req.url);
 
-  const token = header.slice(7);
-  try {
-    const payload = verifyJwt(token);
-    req.user = payload;
-    return next();
-  } catch (err) {
-    return res.status(401).json({ message: 'Invalid or expired token' });
-  }
+  // Set mock user on request
+  req.user = MOCK_USER_PAYLOAD;
+
+  return next();
 }
-

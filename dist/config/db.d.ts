@@ -1,2 +1,2 @@
-export declare const prisma: any;
+export { db } from './firebase';
 //# sourceMappingURL=db.d.ts.map

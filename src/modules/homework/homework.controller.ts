@@ -15,7 +15,7 @@ export class HomeworkController {
             }
 
             const homework = await homeworkService.createHomework({
-                subjectId: parseInt(subjectId),
+                subjectId,
                 title,
                 description,
                 dueDate: new Date(dueDate),
@@ -38,10 +38,9 @@ export class HomeworkController {
 
     async getHomeworkBySubject(req: Request, res: Response, next: NextFunction) {
         try {
-            const paramId = req.params.subjectId as string;
-            if (!paramId) return res.status(400).json({ message: 'Subject ID required' });
+            const subjectId = req.params.subjectId as string;
+            if (!subjectId) return res.status(400).json({ message: 'Subject ID required' });
 
-            const subjectId = parseInt(paramId);
             const homework = await homeworkService.getHomeworkBySubject(subjectId);
             res.json(homework);
         } catch (error) {
@@ -51,10 +50,9 @@ export class HomeworkController {
 
     async getHomeworkById(req: Request, res: Response, next: NextFunction) {
         try {
-            const paramId = req.params.id as string;
-            if (!paramId) return res.status(400).json({ message: 'Homework ID required' });
+            const id = req.params.id as string;
+            if (!id) return res.status(400).json({ message: 'Homework ID required' });
 
-            const id = parseInt(paramId);
             const homework = await homeworkService.getHomeworkById(id);
 
             if (!homework) {
@@ -78,8 +76,8 @@ export class HomeworkController {
             }
 
             const submission = await homeworkService.submitHomework({
-                homeworkId: parseInt(homeworkId),
-                studentId: parseInt(studentId),
+                homeworkId,
+                studentId,
                 content,
                 fileUrl,
             });
@@ -92,10 +90,9 @@ export class HomeworkController {
 
     async gradeHomework(req: Request, res: Response, next: NextFunction) {
         try {
-            const paramId = req.params.submissionId as string;
-            if (!paramId) return res.status(400).json({ message: 'Submission ID required' });
+            const submissionId = req.params.submissionId as string;
+            if (!submissionId) return res.status(400).json({ message: 'Submission ID required' });
 
-            const submissionId = parseInt(paramId);
             const { grade } = req.body;
 
             if (!grade) {
@@ -111,10 +108,9 @@ export class HomeworkController {
 
     async getStudentHomework(req: Request, res: Response, next: NextFunction) {
         try {
-            const paramId = req.params.studentId as string;
-            if (!paramId) return res.status(400).json({ message: 'Student ID required' });
+            const studentId = req.params.studentId as string;
+            if (!studentId) return res.status(400).json({ message: 'Student ID required' });
 
-            const studentId = parseInt(paramId);
             const homework = await homeworkService.getStudentHomework(studentId);
             res.json(homework);
         } catch (error) {
@@ -124,10 +120,9 @@ export class HomeworkController {
 
     async getHomeworkSubmissions(req: Request, res: Response, next: NextFunction) {
         try {
-            const paramId = req.params.homeworkId as string;
-            if (!paramId) return res.status(400).json({ message: 'Homework ID required' });
+            const homeworkId = req.params.homeworkId as string;
+            if (!homeworkId) return res.status(400).json({ message: 'Homework ID required' });
 
-            const homeworkId = parseInt(paramId);
             const submissions = await homeworkService.getHomeworkSubmissions(homeworkId);
             res.json(submissions);
         } catch (error) {

@@ -4,8 +4,10 @@ export declare class AuthService {
         user: {
             id: any;
             email: any;
-            roles: any;
+            firstName: any;
+            lastName: any;
+            roles: any[];
         };
-    } | null>;
+    }>;
 }
 //# sourceMappingURL=auth.service.d.ts.map

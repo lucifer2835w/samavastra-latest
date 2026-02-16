@@ -1,73 +1,67 @@
-import { prisma } from '../../../config/db';
-import { Prisma } from '../../../generated/prisma/client';
+import { db } from '../../../config/firebase';
 
 export class ProductService {
-    /**
-     * Get all products with pagination and filtering
-     */
     async getAllProducts(page: number = 1, limit: number = 20, activeOnly: boolean = true) {
-        const skip = (page - 1) * limit;
-        const where = activeOnly ? { isActive: true } : {};
+        let query: FirebaseFirestore.Query = db.collection('products');
+        if (activeOnly) {
+            query = query.where('isActive', '==', true);
+        }
+        query = query.orderBy('name', 'asc');
 
-        const [products, total] = await Promise.all([
-            prisma.product.findMany({
-                skip,
-                take: limit,
-                where,
-                include: {
-                    inventory: true,
-                },
-                orderBy: {
-                    name: 'asc',
-                },
-            }),
-            prisma.product.count({ where }),
-        ]);
+        const snap = await query.get();
+        const allProducts: any[] = [];
+
+        for (const doc of snap.docs) {
+            const product = { id: doc.id, ...doc.data() } as any;
+            // Fetch inventory
+            const invSnap = await db.collection('inventory').where('productId', '==', doc.id).limit(1).get();
+            product.inventory = invSnap.empty ? null : { id: invSnap.docs[0].id, ...invSnap.docs[0].data() };
+            allProducts.push(product);
+        }
+
+        const total = allProducts.length;
+        const start = (page - 1) * limit;
+        const products = allProducts.slice(start, start + limit);
 
         return {
             products,
-            pagination: {
-                page,
-                limit,
-                total,
-                totalPages: Math.ceil(total / limit),
-            },
+            pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
         };
     }
 
-    /**
-     * Get product by ID
-     */
-    async getProductById(id: number) {
-        return await prisma.product.findUnique({
-            where: { id },
-            include: {
-                inventory: true,
-                production: {
-                    orderBy: {
-                        timestamp: 'desc',
-                    },
-                    take: 10,
-                },
-            },
-        });
+    async getProductById(id: string) {
+        const doc = await db.collection('products').doc(id).get();
+        if (!doc.exists) return null;
+        const product = { id: doc.id, ...doc.data() } as any;
+
+        // Fetch inventory
+        const invSnap = await db.collection('inventory').where('productId', '==', id).limit(1).get();
+        product.inventory = invSnap.empty ? null : { id: invSnap.docs[0].id, ...invSnap.docs[0].data() };
+
+        // Fetch recent production logs
+        const prodSnap = await db.collection('productionLogs')
+            .where('productId', '==', id)
+            .orderBy('timestamp', 'desc')
+            .limit(10)
+            .get();
+        product.production = prodSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+        return product;
     }
 
-    /**
-     * Get product by SKU
-     */
     async getProductBySku(sku: string) {
-        return await prisma.product.findUnique({
-            where: { sku },
-            include: {
-                inventory: true,
-            },
-        });
+        const snap = await db.collection('products').where('sku', '==', sku).limit(1).get();
+        if (snap.empty) return null;
+
+        const doc = snap.docs[0];
+        const product = { id: doc.id, ...doc.data() } as any;
+
+        const invSnap = await db.collection('inventory').where('productId', '==', doc.id).limit(1).get();
+        product.inventory = invSnap.empty ? null : { id: invSnap.docs[0].id, ...invSnap.docs[0].data() };
+
+        return product;
     }
 
-    /**
-     * Create new product
-     */
     async createProduct(data: {
         sku: string;
         name: string;
@@ -82,36 +76,45 @@ export class ProductService {
     }) {
         console.log('ProductService.createProduct called with:', data);
         try {
-            return await prisma.$transaction(async (tx) => {
+            return await db.runTransaction(async (transaction) => {
                 console.log('Creating product record...');
-                const product = await tx.product.create({
-                    data: {
-                        sku: data.sku,
-                        name: data.name,
-                        description: data.description ?? null,
-                        price: data.price,
-                        isActive: data.isActive ?? true,
-                    },
+                const productRef = db.collection('products').doc();
+                transaction.set(productRef, {
+                    sku: data.sku,
+                    name: data.name,
+                    description: data.description || null,
+                    price: data.price,
+                    isActive: data.isActive ?? true,
                 });
-                console.log('Product created:', product.id);
 
+                let inventory = null;
                 if (data.initialInventory) {
                     console.log('Creating inventory record with:', data.initialInventory);
-                    await tx.inventory.create({
-                        data: {
-                            productId: product.id,
-                            location: data.initialInventory.location ?? null,
-                            quantityOnHand: data.initialInventory.quantityOnHand,
-                            reorderLevel: data.initialInventory.reorderLevel,
-                        },
+                    const invRef = db.collection('inventory').doc();
+                    transaction.set(invRef, {
+                        productId: productRef.id,
+                        location: data.initialInventory.location || null,
+                        quantityOnHand: data.initialInventory.quantityOnHand,
+                        reorderLevel: data.initialInventory.reorderLevel,
                     });
-                    console.log('Inventory created');
+                    inventory = {
+                        id: invRef.id,
+                        productId: productRef.id,
+                        location: data.initialInventory.location || null,
+                        quantityOnHand: data.initialInventory.quantityOnHand,
+                        reorderLevel: data.initialInventory.reorderLevel,
+                    };
                 }
 
-                return await tx.product.findUnique({
-                    where: { id: product.id },
-                    include: { inventory: true },
-                });
+                return {
+                    id: productRef.id,
+                    sku: data.sku,
+                    name: data.name,
+                    description: data.description || null,
+                    price: data.price,
+                    isActive: data.isActive ?? true,
+                    inventory,
+                };
             });
         } catch (error) {
             console.error('Error in ProductService.createProduct:', error);
@@ -119,11 +122,8 @@ export class ProductService {
         }
     }
 
-    /**
-     * Update product
-     */
     async updateProduct(
-        id: number,
+        id: string,
         data: {
             name?: string;
             description?: string;
@@ -131,31 +131,44 @@ export class ProductService {
             isActive?: boolean;
         }
     ) {
-        return await prisma.product.update({
-            where: { id },
-            data,
-            include: {
-                inventory: true,
-            },
-        });
+        const docRef = db.collection('products').doc(id);
+        const updateData: any = {};
+        if (data.name !== undefined) updateData.name = data.name;
+        if (data.description !== undefined) updateData.description = data.description;
+        if (data.price !== undefined) updateData.price = data.price;
+        if (data.isActive !== undefined) updateData.isActive = data.isActive;
+
+        await docRef.update(updateData);
+        const doc = await docRef.get();
+        const product = { id: doc.id, ...doc.data() } as any;
+
+        const invSnap = await db.collection('inventory').where('productId', '==', id).limit(1).get();
+        product.inventory = invSnap.empty ? null : { id: invSnap.docs[0].id, ...invSnap.docs[0].data() };
+
+        return product;
     }
 
-    /**
-     * Search products
-     */
     async searchProducts(query: string) {
-        return await prisma.product.findMany({
-            where: {
-                OR: [
-                    { sku: { contains: query, mode: 'insensitive' } },
-                    { name: { contains: query, mode: 'insensitive' } },
-                    { description: { contains: query, mode: 'insensitive' } },
-                ],
-            },
-            include: {
-                inventory: true,
-            },
-            take: 20,
-        });
+        // Firestore doesn't have full-text search, so we fetch all and filter in memory
+        const snap = await db.collection('products').get();
+        const lowerQuery = query.toLowerCase();
+
+        const results: any[] = [];
+        for (const doc of snap.docs) {
+            const product = doc.data();
+            if (
+                (product.sku || '').toLowerCase().includes(lowerQuery) ||
+                (product.name || '').toLowerCase().includes(lowerQuery) ||
+                (product.description || '').toLowerCase().includes(lowerQuery)
+            ) {
+                const p = { id: doc.id, ...product } as any;
+                const invSnap = await db.collection('inventory').where('productId', '==', doc.id).limit(1).get();
+                p.inventory = invSnap.empty ? null : { id: invSnap.docs[0].id, ...invSnap.docs[0].data() };
+                results.push(p);
+            }
+            if (results.length >= 20) break;
+        }
+
+        return results;
     }
 }

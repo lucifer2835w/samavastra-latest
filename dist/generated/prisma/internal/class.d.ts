@@ -145,6 +145,28 @@ export interface PrismaClient<in LogOpts extends Prisma.LogLevel = never, in out
         omit: OmitOpts;
     }>;
     /**
+     * `prisma.class`: Exposes CRUD operations for the **Class** model.
+      * Example usage:
+      * ```ts
+      * // Fetch zero or more Classes
+      * const classes = await prisma.class.findMany()
+      * ```
+      */
+    get class(): Prisma.ClassDelegate<ExtArgs, {
+        omit: OmitOpts;
+    }>;
+    /**
+     * `prisma.subject`: Exposes CRUD operations for the **Subject** model.
+      * Example usage:
+      * ```ts
+      * // Fetch zero or more Subjects
+      * const subjects = await prisma.subject.findMany()
+      * ```
+      */
+    get subject(): Prisma.SubjectDelegate<ExtArgs, {
+        omit: OmitOpts;
+    }>;
+    /**
      * `prisma.student`: Exposes CRUD operations for the **Student** model.
       * Example usage:
       * ```ts
@@ -153,6 +175,116 @@ export interface PrismaClient<in LogOpts extends Prisma.LogLevel = never, in out
       * ```
       */
     get student(): Prisma.StudentDelegate<ExtArgs, {
+        omit: OmitOpts;
+    }>;
+    /**
+     * `prisma.teacher`: Exposes CRUD operations for the **Teacher** model.
+      * Example usage:
+      * ```ts
+      * // Fetch zero or more Teachers
+      * const teachers = await prisma.teacher.findMany()
+      * ```
+      */
+    get teacher(): Prisma.TeacherDelegate<ExtArgs, {
+        omit: OmitOpts;
+    }>;
+    /**
+     * `prisma.parent`: Exposes CRUD operations for the **Parent** model.
+      * Example usage:
+      * ```ts
+      * // Fetch zero or more Parents
+      * const parents = await prisma.parent.findMany()
+      * ```
+      */
+    get parent(): Prisma.ParentDelegate<ExtArgs, {
+        omit: OmitOpts;
+    }>;
+    /**
+     * `prisma.attendance`: Exposes CRUD operations for the **Attendance** model.
+      * Example usage:
+      * ```ts
+      * // Fetch zero or more Attendances
+      * const attendances = await prisma.attendance.findMany()
+      * ```
+      */
+    get attendance(): Prisma.AttendanceDelegate<ExtArgs, {
+        omit: OmitOpts;
+    }>;
+    /**
+     * `prisma.homework`: Exposes CRUD operations for the **Homework** model.
+      * Example usage:
+      * ```ts
+      * // Fetch zero or more Homework
+      * const homework = await prisma.homework.findMany()
+      * ```
+      */
+    get homework(): Prisma.HomeworkDelegate<ExtArgs, {
+        omit: OmitOpts;
+    }>;
+    /**
+     * `prisma.homeworkSubmission`: Exposes CRUD operations for the **HomeworkSubmission** model.
+      * Example usage:
+      * ```ts
+      * // Fetch zero or more HomeworkSubmissions
+      * const homeworkSubmissions = await prisma.homeworkSubmission.findMany()
+      * ```
+      */
+    get homeworkSubmission(): Prisma.HomeworkSubmissionDelegate<ExtArgs, {
+        omit: OmitOpts;
+    }>;
+    /**
+     * `prisma.parentAccess`: Exposes CRUD operations for the **ParentAccess** model.
+      * Example usage:
+      * ```ts
+      * // Fetch zero or more ParentAccesses
+      * const parentAccesses = await prisma.parentAccess.findMany()
+      * ```
+      */
+    get parentAccess(): Prisma.ParentAccessDelegate<ExtArgs, {
+        omit: OmitOpts;
+    }>;
+    /**
+     * `prisma.exam`: Exposes CRUD operations for the **Exam** model.
+      * Example usage:
+      * ```ts
+      * // Fetch zero or more Exams
+      * const exams = await prisma.exam.findMany()
+      * ```
+      */
+    get exam(): Prisma.ExamDelegate<ExtArgs, {
+        omit: OmitOpts;
+    }>;
+    /**
+     * `prisma.examResult`: Exposes CRUD operations for the **ExamResult** model.
+      * Example usage:
+      * ```ts
+      * // Fetch zero or more ExamResults
+      * const examResults = await prisma.examResult.findMany()
+      * ```
+      */
+    get examResult(): Prisma.ExamResultDelegate<ExtArgs, {
+        omit: OmitOpts;
+    }>;
+    /**
+     * `prisma.notification`: Exposes CRUD operations for the **Notification** model.
+      * Example usage:
+      * ```ts
+      * // Fetch zero or more Notifications
+      * const notifications = await prisma.notification.findMany()
+      * ```
+      */
+    get notification(): Prisma.NotificationDelegate<ExtArgs, {
+        omit: OmitOpts;
+    }>;
+    /**
+     * `prisma.fee`: Exposes CRUD operations for the **Fee** model.
+      * Example usage:
+      * ```ts
+      * // Fetch zero or more Fees
+      * const fees = await prisma.fee.findMany()
+      * ```
+      */
+    get fee(): Prisma.FeeDelegate<ExtArgs, {
         omit: OmitOpts;
     }>;
     /**

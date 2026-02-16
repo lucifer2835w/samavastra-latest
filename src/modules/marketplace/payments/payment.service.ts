@@ -1,275 +1,200 @@
-import { prisma } from '../../../config/db';
-import { Prisma } from '../../../generated/prisma/client';
+import { db } from '../../../config/firebase';
+
+// Helper
+async function fetchOrderWithStudent(orderId: string) {
+    const doc = await db.collection('orders').doc(orderId).get();
+    if (!doc.exists) return null;
+    const order = { id: doc.id, ...doc.data() } as any;
+    if (order.studentId) {
+        const studentDoc = await db.collection('students').doc(order.studentId).get();
+        if (studentDoc.exists) {
+            order.student = { id: studentDoc.id, ...studentDoc.data() } as any;
+            if (order.student.userId) {
+                const userDoc = await db.collection('users').doc(order.student.userId).get();
+                if (userDoc.exists) {
+                    order.student.user = {
+                        firstName: userDoc.data()!.firstName,
+                        lastName: userDoc.data()!.lastName,
+                        email: userDoc.data()!.email,
+                    };
+                }
+            }
+        }
+        // Fetch items
+        const itemsSnap = await db.collection('orderItems').where('orderId', '==', orderId).get();
+        order.items = [];
+        for (const itemDoc of itemsSnap.docs) {
+            const item = { id: itemDoc.id, ...itemDoc.data() } as any;
+            const productDoc = await db.collection('products').doc(item.productId).get();
+            item.product = productDoc.exists ? { id: productDoc.id, ...productDoc.data() } : null;
+            order.items.push(item);
+        }
+    }
+    return order;
+}
+
 export class PaymentService {
-    /**
-     * Create a payment for an order
-     */
     async createPayment(data: {
-        orderId: number;
+        orderId: string;
         amount: number;
         paymentMethod: string;
         transactionReference?: string;
     }) {
-        return await prisma.payment.create({
-            data: {
-                orderId: data.orderId,
-                amount: data.amount,
-                status: 'PENDING',
-                paymentMethod: data.paymentMethod,
-                transactionReference: data.transactionReference ?? null,
-            },
-            include: {
-                order: {
-                    include: {
-                        student: {
-                            include: {
-                                user: {
-                                    select: {
-                                        firstName: true,
-                                        lastName: true,
-                                        email: true,
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-            },
+        const docRef = await db.collection('payments').add({
+            orderId: data.orderId,
+            amount: data.amount,
+            status: 'PENDING',
+            paymentMethod: data.paymentMethod,
+            transactionReference: data.transactionReference || null,
+            paidAt: null,
         });
+        const doc = await docRef.get();
+        const payment = { id: doc.id, ...doc.data() } as any;
+        payment.order = await fetchOrderWithStudent(data.orderId);
+        return payment;
     }
 
-    /**
-     * Get payment by ID
-     */
-    async getPaymentById(id: number) {
-        return await prisma.payment.findUnique({
-            where: { id },
-            include: {
-                order: {
-                    include: {
-                        student: {
-                            include: {
-                                user: {
-                                    select: {
-                                        firstName: true,
-                                        lastName: true,
-                                        email: true,
-                                    },
-                                },
-                            },
-                        },
-                        items: {
-                            include: {
-                                product: true,
-                            },
-                        },
-                    },
-                },
-            },
-        });
+    async getPaymentById(id: string) {
+        const doc = await db.collection('payments').doc(id).get();
+        if (!doc.exists) return null;
+        const payment = { id: doc.id, ...doc.data() } as any;
+        if (payment.orderId) {
+            payment.order = await fetchOrderWithStudent(payment.orderId);
+        }
+        return payment;
     }
 
-    /**
-     * Get payments for an order
-     */
-    async getPaymentsByOrderId(orderId: number) {
-        return await prisma.payment.findMany({
-            where: { orderId },
-            orderBy: {
-                id: 'desc',
-            },
-        });
+    async getPaymentsByOrderId(orderId: string) {
+        const snap = await db.collection('payments')
+            .where('orderId', '==', orderId)
+            .get();
+        return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     }
 
-    /**
-     * Update payment status
-     */
     async updatePaymentStatus(
-        id: number,
+        id: string,
         status: string,
         transactionReference?: string
     ) {
-        const data: any = { status };
+        return await db.runTransaction(async (transaction) => {
+            const paymentDoc = await transaction.get(db.collection('payments').doc(id));
+            if (!paymentDoc.exists) throw new Error('Payment not found');
 
-        if (status === 'COMPLETED') {
-            data.paidAt = new Date();
-        }
-
-        if (transactionReference) {
-            data.transactionReference = transactionReference;
-        }
-
-        return await prisma.$transaction(async (tx) => {
-            const payment = await tx.payment.update({
-                where: { id },
-                data,
-                include: {
-                    order: true,
-                },
-            });
-
-            // If payment is completed, update order status
+            const updateData: any = { status };
             if (status === 'COMPLETED') {
-                const orderPayments = await tx.payment.findMany({
-                    where: { orderId: payment.orderId },
-                });
+                updateData.paidAt = new Date();
+            }
+            if (transactionReference) {
+                updateData.transactionReference = transactionReference;
+            }
 
-                const totalPaid = orderPayments.reduce((sum, p) => {
-                    if (p.status === 'COMPLETED') {
-                        return sum + Number(p.amount);
+            transaction.update(paymentDoc.ref, updateData);
+
+            const paymentData = paymentDoc.data()!;
+
+            // If payment is completed, check if order should be updated
+            if (status === 'COMPLETED' && paymentData.orderId) {
+                const paymentsSnap = await transaction.get(
+                    db.collection('payments').where('orderId', '==', paymentData.orderId)
+                );
+
+                let totalPaid = 0;
+                paymentsSnap.docs.forEach(pDoc => {
+                    const p = pDoc.data();
+                    if (p.status === 'COMPLETED' || pDoc.id === id) {
+                        totalPaid += Number(p.amount || 0);
                     }
-                    return sum;
-                }, 0);
-
-                const order = await tx.order.findUnique({
-                    where: { id: payment.orderId },
                 });
 
-                if (order && totalPaid >= Number(order.totalAmount)) {
-                    await tx.order.update({
-                        where: { id: payment.orderId },
-                        data: { status: 'PROCESSING' },
-                    });
+                const orderDoc = await transaction.get(
+                    db.collection('orders').doc(paymentData.orderId)
+                );
+
+                if (orderDoc.exists && totalPaid >= Number(orderDoc.data()!.totalAmount)) {
+                    transaction.update(orderDoc.ref, { status: 'PROCESSING', updatedAt: new Date() });
                 }
             }
 
-            return payment;
+            return {
+                id: paymentDoc.id,
+                ...paymentData,
+                ...updateData,
+            };
         });
     }
 
-    /**
-     * Process a refund
-     */
-    async processRefund(orderId: number, amount: number, reason?: string) {
-        return await prisma.payment.create({
-            data: {
-                orderId,
-                amount: -Math.abs(amount), // Negative amount for refund
-                status: 'COMPLETED',
-                paymentMethod: 'REFUND',
-                transactionReference: `REFUND-${Date.now()}`,
-                paidAt: new Date(),
-            },
-            include: {
-                order: {
-                    include: {
-                        student: {
-                            include: {
-                                user: {
-                                    select: {
-                                        firstName: true,
-                                        lastName: true,
-                                        email: true,
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-            },
+    async processRefund(orderId: string, amount: number, reason?: string) {
+        const docRef = await db.collection('payments').add({
+            orderId,
+            amount: -Math.abs(amount),
+            status: 'COMPLETED',
+            paymentMethod: 'REFUND',
+            transactionReference: `REFUND-${Date.now()}`,
+            paidAt: new Date(),
         });
+        const doc = await docRef.get();
+        const payment = { id: doc.id, ...doc.data() } as any;
+        payment.order = await fetchOrderWithStudent(orderId);
+        return payment;
     }
 
-    /**
-     * Get all payments with pagination
-     */
     async getAllPayments(
         page: number = 1,
         limit: number = 20,
         status?: string,
-        orderId?: number
+        orderId?: string
     ) {
-        const skip = (page - 1) * limit;
-        const where: any = {};
+        let query: FirebaseFirestore.Query = db.collection('payments');
+        if (status) query = query.where('status', '==', status);
+        if (orderId) query = query.where('orderId', '==', orderId);
 
-        if (status) {
-            where.status = status;
+        const snap = await query.get();
+        const allPayments: any[] = [];
+
+        for (const doc of snap.docs) {
+            const payment = { id: doc.id, ...doc.data() } as any;
+            if (payment.orderId) {
+                payment.order = await fetchOrderWithStudent(payment.orderId);
+            }
+            allPayments.push(payment);
         }
 
-        if (orderId) {
-            where.orderId = orderId;
-        }
-
-        const [payments, total] = await Promise.all([
-            prisma.payment.findMany({
-                skip,
-                take: limit,
-                where,
-                include: {
-                    order: {
-                        include: {
-                            student: {
-                                include: {
-                                    user: {
-                                        select: {
-                                            firstName: true,
-                                            lastName: true,
-                                            email: true,
-                                        },
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-                orderBy: {
-                    id: 'desc',
-                },
-            }),
-            prisma.payment.count({ where }),
-        ]);
+        const total = allPayments.length;
+        const start = (page - 1) * limit;
+        const payments = allPayments.slice(start, start + limit);
 
         return {
             payments,
-            pagination: {
-                page,
-                limit,
-                total,
-                totalPages: Math.ceil(total / limit),
-            },
+            pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
         };
     }
 
-    /**
-     * Get payment statistics
-     */
     async getPaymentStats() {
-        const [total, pending, completed, failed] = await Promise.all([
-            prisma.payment.count(),
-            prisma.payment.count({ where: { status: 'PENDING' } }),
-            prisma.payment.count({ where: { status: 'COMPLETED' } }),
-            prisma.payment.count({ where: { status: 'FAILED' } }),
-        ]);
+        const snap = await db.collection('payments').get();
+        let total = 0, pending = 0, completed = 0, failed = 0;
+        let totalRevenue = 0;
+        let totalRefunds = 0;
 
-        const totalRevenue = await prisma.payment.aggregate({
-            where: {
-                status: 'COMPLETED',
-                amount: { gt: 0 }, // Exclude refunds
-            },
-            _sum: {
-                amount: true,
-            },
-        });
-
-        const totalRefunds = await prisma.payment.aggregate({
-            where: {
-                status: 'COMPLETED',
-                amount: { lt: 0 }, // Only refunds
-            },
-            _sum: {
-                amount: true,
-            },
+        snap.docs.forEach(doc => {
+            const data = doc.data();
+            total++;
+            switch (data.status) {
+                case 'PENDING': pending++; break;
+                case 'COMPLETED':
+                    completed++;
+                    const amount = Number(data.amount || 0);
+                    if (amount > 0) totalRevenue += amount;
+                    if (amount < 0) totalRefunds += Math.abs(amount);
+                    break;
+                case 'FAILED': failed++; break;
+            }
         });
 
         return {
             total,
-            byStatus: {
-                pending,
-                completed,
-                failed,
-            },
-            totalRevenue: totalRevenue._sum.amount || 0,
-            totalRefunds: Math.abs(Number(totalRefunds._sum.amount || 0)),
+            byStatus: { pending, completed, failed },
+            totalRevenue,
+            totalRefunds,
         };
     }
 }

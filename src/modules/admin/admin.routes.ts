@@ -20,7 +20,6 @@ router.post('/users/:id/reset-password', ...adminOnly, adminController.resetPass
 
 // System Analytics
 router.get('/analytics', ...adminOnly, adminController.getSystemAnalytics);
-router.get('/analytics/enrollment-trends', ...adminOnly, adminController.getEnrollmentTrends);
-router.get('/analytics/class-distribution', ...adminOnly, adminController.getClassDistribution);
+router.get('/roles', ...adminOnly, adminController.getRoles);
 
 export default router;

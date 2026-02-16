@@ -6,10 +6,9 @@ const parentService = new ParentService();
 export class ParentController {
     async getParentChildren(req: Request, res: Response, next: NextFunction) {
         try {
-            const paramId = req.params.parentId as string;
-            if (!paramId) return res.status(400).json({ message: 'Parent ID required' });
+            const parentId = req.params.parentId as string;
+            if (!parentId) return res.status(400).json({ message: 'Parent ID required' });
 
-            const parentId = parseInt(paramId);
             const children = await parentService.getParentChildren(parentId);
             res.json(children);
         } catch (error) {
@@ -19,15 +18,13 @@ export class ParentController {
 
     async getChildPerformance(req: Request, res: Response, next: NextFunction) {
         try {
-            const { parentId, studentId } = req.params;
+            const parentId = req.params.parentId as string;
+            const studentId = req.params.studentId as string;
             if (!parentId || !studentId) {
                 return res.status(400).json({ message: 'Parent ID and Student ID required' });
             }
 
-            const performance = await parentService.getChildPerformance(
-                parseInt(parentId as string),
-                parseInt(studentId as string)
-            );
+            const performance = await parentService.getChildPerformance(parentId, studentId);
             res.json(performance);
         } catch (error: any) {
             if (error.message === 'Access denied to this student') {
@@ -39,15 +36,13 @@ export class ParentController {
 
     async getChildGrades(req: Request, res: Response, next: NextFunction) {
         try {
-            const { parentId, studentId } = req.params;
+            const parentId = req.params.parentId as string;
+            const studentId = req.params.studentId as string;
             if (!parentId || !studentId) {
                 return res.status(400).json({ message: 'Parent ID and Student ID required' });
             }
 
-            const grades = await parentService.getChildGrades(
-                parseInt(parentId as string),
-                parseInt(studentId as string)
-            );
+            const grades = await parentService.getChildGrades(parentId, studentId);
             res.json(grades);
         } catch (error: any) {
             if (error.message.includes('Access denied')) {
@@ -59,18 +54,15 @@ export class ParentController {
 
     async getChildAttendance(req: Request, res: Response, next: NextFunction) {
         try {
-            const { parentId, studentId } = req.params;
+            const parentId = req.params.parentId as string;
+            const studentId = req.params.studentId as string;
             const days = req.query.days ? parseInt(req.query.days as string) : 30;
 
             if (!parentId || !studentId) {
                 return res.status(400).json({ message: 'Parent ID and Student ID required' });
             }
 
-            const attendance = await parentService.getChildAttendance(
-                parseInt(parentId as string),
-                parseInt(studentId as string),
-                days
-            );
+            const attendance = await parentService.getChildAttendance(parentId, studentId, days);
             res.json(attendance);
         } catch (error: any) {
             if (error.message.includes('Access denied')) {
@@ -82,15 +74,13 @@ export class ParentController {
 
     async getChildFees(req: Request, res: Response, next: NextFunction) {
         try {
-            const { parentId, studentId } = req.params;
+            const parentId = req.params.parentId as string;
+            const studentId = req.params.studentId as string;
             if (!parentId || !studentId) {
                 return res.status(400).json({ message: 'Parent ID and Student ID required' });
             }
 
-            const fees = await parentService.getChildFees(
-                parseInt(parentId as string),
-                parseInt(studentId as string)
-            );
+            const fees = await parentService.getChildFees(parentId, studentId);
             res.json(fees);
         } catch (error: any) {
             if (error.message.includes('Access denied')) {
@@ -102,15 +92,13 @@ export class ParentController {
 
     async getChildHomework(req: Request, res: Response, next: NextFunction) {
         try {
-            const { parentId, studentId } = req.params;
+            const parentId = req.params.parentId as string;
+            const studentId = req.params.studentId as string;
             if (!parentId || !studentId) {
                 return res.status(400).json({ message: 'Parent ID and Student ID required' });
             }
 
-            const homework = await parentService.getChildHomework(
-                parseInt(parentId as string),
-                parseInt(studentId as string)
-            );
+            const homework = await parentService.getChildHomework(parentId, studentId);
             res.json(homework);
         } catch (error: any) {
             if (error.message.includes('Access denied')) {
@@ -122,18 +110,15 @@ export class ParentController {
 
     async updateAccess(req: Request, res: Response, next: NextFunction) {
         try {
-            const { parentId, studentId } = req.params;
+            const parentId = req.params.parentId as string;
+            const studentId = req.params.studentId as string;
             const permissions = req.body;
 
             if (!parentId || !studentId) {
                 return res.status(400).json({ message: 'Parent ID and Student ID required' });
             }
 
-            const access = await parentService.updateAccess(
-                parseInt(parentId as string),
-                parseInt(studentId as string),
-                permissions
-            );
+            const access = await parentService.updateAccess(parentId, studentId, permissions);
             res.json(access);
         } catch (error) {
             next(error);

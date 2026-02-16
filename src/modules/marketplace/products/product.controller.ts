@@ -20,7 +20,7 @@ export class ProductController {
 
     async getProduct(req: Request, res: Response, next: NextFunction) {
         try {
-            const id = parseInt(req.params.id as string);
+            const id = req.params.id as string;
             const product = await productService.getProductById(id);
 
             if (!product) {
@@ -63,7 +63,7 @@ export class ProductController {
 
     async updateProduct(req: Request, res: Response, next: NextFunction) {
         try {
-            const id = parseInt(req.params.id as string);
+            const id = req.params.id as string;
             const { name, description, price, isActive } = req.body;
 
             const updateData: any = {

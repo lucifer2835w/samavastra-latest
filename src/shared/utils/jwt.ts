@@ -2,7 +2,7 @@ import jwt, { SignOptions, Secret } from 'jsonwebtoken';
 import { env } from '../../config/env';
 
 export interface JwtPayload {
-  id: number;
+  id: string;
   roles: string[];
 }
 

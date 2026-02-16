@@ -357,9 +357,6 @@ export type LogisticsTrackingUncheckedUpdateManyWithoutOrderNestedInput = {
     updateMany?: Prisma.LogisticsTrackingUpdateManyWithWhereWithoutOrderInput | Prisma.LogisticsTrackingUpdateManyWithWhereWithoutOrderInput[];
     deleteMany?: Prisma.LogisticsTrackingScalarWhereInput | Prisma.LogisticsTrackingScalarWhereInput[];
 };
-export type NullableDateTimeFieldUpdateOperationsInput = {
-    set?: Date | string | null;
-};
 export type LogisticsTrackingCreateWithoutOrderInput = {
     trackingNumber: string;
     status: string;

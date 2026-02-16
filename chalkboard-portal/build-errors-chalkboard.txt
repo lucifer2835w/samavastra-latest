@@ -1,0 +1,6 @@
+﻿
+> chalkboard-portal@0.0.0 build
+> tsc -b && vite build
+
+src/pages/academics/TeacherGrading.tsx(94,11): error TS6133: 'handleRecordResult' is declared but its value is never read.
+src/pages/homework/HomeworkTeacher.tsx(21,11): error TS6133: 'user' is declared but its value is never read.

@@ -29,7 +29,7 @@ export class OrderController {
 
     async getOrder(req: Request, res: Response, next: NextFunction) {
         try {
-            const id = parseInt(req.params.id as string);
+            const id = req.params.id as string;
             const order = await orderService.getOrderById(id);
 
             if (!order) {
@@ -47,7 +47,7 @@ export class OrderController {
             const page = parseInt(req.query.page as string) || 1;
             const limit = parseInt(req.query.limit as string) || 20;
             const status = req.query.status as string;
-            const studentId = req.query.studentId ? parseInt(req.query.studentId as string) : undefined;
+            const studentId = req.query.studentId ? (req.query.studentId as string) : undefined;
 
             const result = await orderService.getAllOrders(page, limit, status, studentId);
             res.json(result);
@@ -58,7 +58,7 @@ export class OrderController {
 
     async updateOrderStatus(req: Request, res: Response, next: NextFunction) {
         try {
-            const id = parseInt(req.params.id as string);
+            const id = req.params.id as string;
             const { status } = req.body;
 
             if (!status) {
@@ -77,7 +77,7 @@ export class OrderController {
 
     async cancelOrder(req: Request, res: Response, next: NextFunction) {
         try {
-            const id = parseInt(req.params.id as string);
+            const id = req.params.id as string;
             const order = await orderService.cancelOrder(id);
             res.json(order);
         } catch (error: any) {

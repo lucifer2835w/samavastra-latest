@@ -19,7 +19,7 @@ export async function createFee(req: Request, res: Response) {
     }
 }
 
-import { prisma } from '../../config/db';
+import { db } from '../../config/firebase';
 
 export async function getStudentFees(req: Request, res: Response) {
     try {
@@ -28,13 +28,14 @@ export async function getStudentFees(req: Request, res: Response) {
         let studentId;
 
         if (user.roles.includes('STUDENT')) {
-            const student = await prisma.student.findUnique({ where: { userId: user.id } });
+            const studentSnap = await db.collection('students').where('userId', '==', user.id).limit(1).get();
+            const student = studentSnap.empty ? null : { id: studentSnap.docs[0].id, ...studentSnap.docs[0].data() };
             if (!student) return res.status(404).json({ message: "Student profile not found" });
             studentId = student.id;
         } else {
             const paramId = req.params.studentId;
             if (!paramId) return res.status(400).json({ message: "Student ID parameter required" });
-            studentId = parseInt(paramId as string);
+            studentId = paramId as string;
         }
 
         const fees = await service.getFeesForStudent(studentId);

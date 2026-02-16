@@ -48,7 +48,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.NullsOrder = exports.QueryMode = exports.SortOrder = exports.PaymentScalarFieldEnum = exports.LogisticsTrackingScalarFieldEnum = exports.ProductionLogScalarFieldEnum = exports.InventoryScalarFieldEnum = exports.OrderItemScalarFieldEnum = exports.OrderScalarFieldEnum = exports.ProductScalarFieldEnum = exports.DepartmentScalarFieldEnum = exports.StudentScalarFieldEnum = exports.UserRoleScalarFieldEnum = exports.RoleScalarFieldEnum = exports.UserScalarFieldEnum = exports.TransactionIsolationLevel = exports.ModelName = exports.AnyNull = exports.JsonNull = exports.DbNull = exports.NullTypes = exports.Decimal = void 0;
+exports.NullsOrder = exports.QueryMode = exports.SortOrder = exports.PaymentScalarFieldEnum = exports.LogisticsTrackingScalarFieldEnum = exports.ProductionLogScalarFieldEnum = exports.InventoryScalarFieldEnum = exports.OrderItemScalarFieldEnum = exports.OrderScalarFieldEnum = exports.ProductScalarFieldEnum = exports.DepartmentScalarFieldEnum = exports.FeeScalarFieldEnum = exports.NotificationScalarFieldEnum = exports.ExamResultScalarFieldEnum = exports.ExamScalarFieldEnum = exports.ParentAccessScalarFieldEnum = exports.HomeworkSubmissionScalarFieldEnum = exports.HomeworkScalarFieldEnum = exports.AttendanceScalarFieldEnum = exports.ParentScalarFieldEnum = exports.TeacherScalarFieldEnum = exports.StudentScalarFieldEnum = exports.SubjectScalarFieldEnum = exports.ClassScalarFieldEnum = exports.UserRoleScalarFieldEnum = exports.RoleScalarFieldEnum = exports.UserScalarFieldEnum = exports.TransactionIsolationLevel = exports.ModelName = exports.AnyNull = exports.JsonNull = exports.DbNull = exports.NullTypes = exports.Decimal = void 0;
 const runtime = __importStar(require("@prisma/client/runtime/index-browser"));
 exports.Decimal = runtime.Decimal;
 exports.NullTypes = {
@@ -78,7 +78,19 @@ exports.ModelName = {
     User: 'User',
     Role: 'Role',
     UserRole: 'UserRole',
+    Class: 'Class',
+    Subject: 'Subject',
     Student: 'Student',
+    Teacher: 'Teacher',
+    Parent: 'Parent',
+    Attendance: 'Attendance',
+    Homework: 'Homework',
+    HomeworkSubmission: 'HomeworkSubmission',
+    ParentAccess: 'ParentAccess',
+    Exam: 'Exam',
+    ExamResult: 'ExamResult',
+    Notification: 'Notification',
+    Fee: 'Fee',
     Department: 'Department',
     Product: 'Product',
     Order: 'Order',
@@ -118,12 +130,105 @@ exports.UserRoleScalarFieldEnum = {
     userId: 'userId',
     roleId: 'roleId'
 };
+exports.ClassScalarFieldEnum = {
+    id: 'id',
+    grade: 'grade',
+    section: 'section',
+    teacherId: 'teacherId'
+};
+exports.SubjectScalarFieldEnum = {
+    id: 'id',
+    name: 'name',
+    code: 'code',
+    description: 'description'
+};
 exports.StudentScalarFieldEnum = {
     id: 'id',
     userId: 'userId',
     studentNumber: 'studentNumber',
-    grade: 'grade',
+    classId: 'classId',
+    parentId: 'parentId',
     status: 'status'
+};
+exports.TeacherScalarFieldEnum = {
+    id: 'id',
+    userId: 'userId',
+    employeeId: 'employeeId',
+    qualification: 'qualification'
+};
+exports.ParentScalarFieldEnum = {
+    id: 'id',
+    userId: 'userId'
+};
+exports.AttendanceScalarFieldEnum = {
+    id: 'id',
+    studentId: 'studentId',
+    date: 'date',
+    status: 'status',
+    remarks: 'remarks'
+};
+exports.HomeworkScalarFieldEnum = {
+    id: 'id',
+    subjectId: 'subjectId',
+    title: 'title',
+    description: 'description',
+    dueDate: 'dueDate'
+};
+exports.HomeworkSubmissionScalarFieldEnum = {
+    id: 'id',
+    homeworkId: 'homeworkId',
+    studentId: 'studentId',
+    content: 'content',
+    fileUrl: 'fileUrl',
+    submittedAt: 'submittedAt',
+    grade: 'grade'
+};
+exports.ParentAccessScalarFieldEnum = {
+    id: 'id',
+    parentId: 'parentId',
+    studentId: 'studentId',
+    canViewGrades: 'canViewGrades',
+    canViewAttendance: 'canViewAttendance',
+    canViewFees: 'canViewFees',
+    canViewHomework: 'canViewHomework'
+};
+exports.ExamScalarFieldEnum = {
+    id: 'id',
+    subjectId: 'subjectId',
+    name: 'name',
+    date: 'date',
+    maxMarks: 'maxMarks'
+};
+exports.ExamResultScalarFieldEnum = {
+    id: 'id',
+    examId: 'examId',
+    studentId: 'studentId',
+    marksObtained: 'marksObtained',
+    grade: 'grade'
+};
+exports.NotificationScalarFieldEnum = {
+    id: 'id',
+    title: 'title',
+    message: 'message',
+    type: 'type',
+    senderId: 'senderId',
+    recipientId: 'recipientId',
+    targetRole: 'targetRole',
+    classId: 'classId',
+    isRead: 'isRead',
+    createdAt: 'createdAt'
+};
+exports.FeeScalarFieldEnum = {
+    id: 'id',
+    studentId: 'studentId',
+    title: 'title',
+    amount: 'amount',
+    dueDate: 'dueDate',
+    status: 'status',
+    paymentDate: 'paymentDate',
+    transactionRef: 'transactionRef',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
 };
 exports.DepartmentScalarFieldEnum = {
     id: 'id',

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { AcademicsService } from './academics.service';
-import { prisma } from '../../config/db';
+import { db } from '../../config/firebase';
 import { AuthenticatedRequest } from '../../middleware/auth';
 
 const academicsService = new AcademicsService();
@@ -16,9 +16,6 @@ export class AcademicsController {
             const newClass = await academicsService.createClass({ grade, section, teacherId });
             res.status(201).json(newClass);
         } catch (error: any) {
-            if (error.code === 'P2002') {
-                return res.status(409).json({ message: 'Class already exists' });
-            }
             next(error);
         }
     }
@@ -34,7 +31,7 @@ export class AcademicsController {
 
     async getClass(req: Request, res: Response, next: NextFunction) {
         try {
-            const id = parseInt(req.params.id as string);
+            const id = req.params.id as string;
             const classItem = await academicsService.getClassById(id);
             if (!classItem) {
                 return res.status(404).json({ message: 'Class not found' });
@@ -55,9 +52,6 @@ export class AcademicsController {
             const subject = await academicsService.createSubject({ name, code, description });
             res.status(201).json(subject);
         } catch (error: any) {
-            if (error.code === 'P2002') {
-                return res.status(409).json({ message: 'Subject code already exists' });
-            }
             next(error);
         }
     }
@@ -79,7 +73,7 @@ export class AcademicsController {
                 return res.status(400).json({ message: 'All fields are required' });
             }
             const exam = await academicsService.createExam({
-                subjectId: parseInt(subjectId),
+                subjectId,
                 name,
                 date: new Date(date),
                 maxMarks: parseInt(maxMarks),
@@ -92,9 +86,8 @@ export class AcademicsController {
 
     async getExamsBySubject(req: Request, res: Response, next: NextFunction) {
         try {
-            const paramId = req.params.subjectId;
-            if (!paramId) return res.status(400).json({ message: "Subject ID required" });
-            const subjectId = parseInt(paramId as string);
+            const subjectId = req.params.subjectId as string;
+            if (!subjectId) return res.status(400).json({ message: "Subject ID required" });
             const exams = await academicsService.getExamsBySubject(subjectId);
             res.json(exams);
         } catch (error) {
@@ -109,8 +102,8 @@ export class AcademicsController {
                 return res.status(400).json({ message: 'examId, studentId, and marksObtained are required' });
             }
             const result = await academicsService.recordExamResult({
-                examId: parseInt(examId),
-                studentId: parseInt(studentId),
+                examId,
+                studentId,
                 marksObtained: parseFloat(marksObtained),
                 grade,
             });
@@ -128,7 +121,7 @@ export class AcademicsController {
                 return res.status(400).json({ message: 'studentId, date, and status are required' });
             }
             const attendance = await academicsService.recordAttendance({
-                studentId: parseInt(studentId),
+                studentId,
                 date: new Date(date),
                 status,
                 remarks,
@@ -141,9 +134,8 @@ export class AcademicsController {
 
     async getAttendanceByClass(req: Request, res: Response, next: NextFunction) {
         try {
-            const paramId = req.params.classId;
-            if (!paramId) return res.status(400).json({ message: "Class ID required" });
-            const classId = parseInt(paramId as string);
+            const classId = req.params.classId as string;
+            if (!classId) return res.status(400).json({ message: "Class ID required" });
             const { startDate, endDate } = req.query;
             const attendance = await academicsService.getAttendanceByClass(
                 classId,
@@ -163,23 +155,14 @@ export class AcademicsController {
             const user = req.user;
             let studentId;
 
-            // If student, use own ID
             if (user.roles.includes('STUDENT')) {
-                // user.student is not automatically populated by basic auth middleware usually,
-                // but let's assume we can find it or user.id is linked.
-                // Ideally middleware should populate full profile. 
-                // For now, let's fetch based on userId -> student record check
-                // Quick fix: assuming we will pass studentId as param or logic in service handles userId
-                // But service expects studentId. 
-                // Let's rely on a helper or just query:
-                const student = await prisma.student.findUnique({ where: { userId: user.id } });
-                if (!student) return res.status(404).json({ message: "Student profile not found" });
-                studentId = student.id;
+                const studentSnap = await db.collection('students').where('userId', '==', user.id).limit(1).get();
+                if (studentSnap.empty) return res.status(404).json({ message: "Student profile not found" });
+                studentId = studentSnap.docs[0].id;
             } else {
-                // Teacher/Admin requesting specific student
                 const paramId = req.params.studentId;
                 if (!paramId) return res.status(400).json({ message: "Student ID parameter required" });
-                studentId = parseInt(paramId as string);
+                studentId = paramId as string;
             }
 
             if (!studentId) return res.status(400).json({ message: "Student ID required" });

@@ -30,7 +30,7 @@ export class PaymentController {
 
     async getPayment(req: Request, res: Response, next: NextFunction) {
         try {
-            const id = parseInt(req.params.id as string);
+            const id = req.params.id as string;
             const payment = await paymentService.getPaymentById(id);
 
             if (!payment) {
@@ -45,7 +45,7 @@ export class PaymentController {
 
     async getPaymentsByOrder(req: Request, res: Response, next: NextFunction) {
         try {
-            const orderId = parseInt(req.params.orderId as string);
+            const orderId = req.params.orderId as string;
             const payments = await paymentService.getPaymentsByOrderId(orderId);
             res.json(payments);
         } catch (error) {
@@ -55,7 +55,7 @@ export class PaymentController {
 
     async updatePaymentStatus(req: Request, res: Response, next: NextFunction) {
         try {
-            const id = parseInt(req.params.id as string);
+            const id = req.params.id as string;
             const { status, transactionReference } = req.body;
 
             if (!status) {
@@ -104,7 +104,7 @@ export class PaymentController {
             const page = parseInt(req.query.page as string) || 1;
             const limit = parseInt(req.query.limit as string) || 20;
             const status = req.query.status as string;
-            const orderId = req.query.orderId ? parseInt(req.query.orderId as string) : undefined;
+            const orderId = req.query.orderId ? (req.query.orderId as string) : undefined;
 
             const result = await paymentService.getAllPayments(page, limit, status, orderId);
             res.json(result);

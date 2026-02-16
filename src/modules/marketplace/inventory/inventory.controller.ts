@@ -20,7 +20,7 @@ export class InventoryController {
 
     async getInventoryByProduct(req: Request, res: Response, next: NextFunction) {
         try {
-            const productId = parseInt(req.params.productId as string);
+            const productId = req.params.productId as string;
             const inventory = await inventoryService.getInventoryByProductId(productId);
 
             if (!inventory) {
@@ -35,7 +35,7 @@ export class InventoryController {
 
     async updateInventory(req: Request, res: Response, next: NextFunction) {
         try {
-            const productId = parseInt(req.params.productId as string);
+            const productId = req.params.productId as string;
             const { quantityOnHand, reorderLevel, location } = req.body;
 
             const inventory = await inventoryService.updateInventory(productId, {
@@ -55,7 +55,7 @@ export class InventoryController {
 
     async adjustInventory(req: Request, res: Response, next: NextFunction) {
         try {
-            const productId = parseInt(req.params.productId as string);
+            const productId = req.params.productId as string;
             const { adjustment, notes } = req.body;
 
             if (adjustment === undefined || adjustment === null) {

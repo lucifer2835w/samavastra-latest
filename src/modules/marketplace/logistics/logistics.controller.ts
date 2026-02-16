@@ -38,7 +38,7 @@ export class LogisticsController {
 
     async getTracking(req: Request, res: Response, next: NextFunction) {
         try {
-            const id = parseInt(req.params.id as string);
+            const id = req.params.id as string;
             const tracking = await logisticsService.getTrackingById(id);
 
             if (!tracking) {
@@ -68,7 +68,7 @@ export class LogisticsController {
 
     async getTrackingByOrder(req: Request, res: Response, next: NextFunction) {
         try {
-            const orderId = parseInt(req.params.orderId as string);
+            const orderId = req.params.orderId as string;
             const tracking = await logisticsService.getTrackingByOrderId(orderId);
             res.json(tracking);
         } catch (error) {
@@ -78,7 +78,7 @@ export class LogisticsController {
 
     async updateTracking(req: Request, res: Response, next: NextFunction) {
         try {
-            const id = parseInt(req.params.id as string);
+            const id = req.params.id as string;
             const { status, estimatedDelivery, actualDelivery } = req.body;
 
             const updateData: any = { status };
@@ -103,7 +103,7 @@ export class LogisticsController {
 
     async markAsDelivered(req: Request, res: Response, next: NextFunction) {
         try {
-            const id = parseInt(req.params.id as string);
+            const id = req.params.id as string;
             const tracking = await logisticsService.markAsDelivered(id);
             res.json(tracking);
         } catch (error: any) {

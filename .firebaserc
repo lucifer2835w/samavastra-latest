@@ -1,0 +1,21 @@
+{
+  "projects": {
+    "default": "samavastra-3d457"
+  },
+  "targets": {
+    "samavastra-3d457": {
+      "hosting": {
+        "samavest": [
+          "samavastra-portal"
+        ],
+        "chalkboard": [
+          "samavastra-3d457-chalkboard"
+        ],
+        "launcher": [
+          "samavastra-3d457"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}

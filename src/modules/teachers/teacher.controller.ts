@@ -25,7 +25,7 @@ export class TeacherController {
 
     async getTeacher(req: Request, res: Response, next: NextFunction) {
         try {
-            const id = parseInt(req.params.id as string);
+            const id = req.params.id as string;
             const teacher = await teacherService.getTeacherById(id);
             if (!teacher) {
                 return res.status(404).json({ message: 'Teacher not found' });
@@ -50,7 +50,7 @@ export class TeacherController {
 
     async updateTeacher(req: Request, res: Response, next: NextFunction) {
         try {
-            const id = parseInt(req.params.id as string);
+            const id = req.params.id as string;
             const { qualification } = req.body;
 
             const teacher = await teacherService.updateTeacher(id, {

@@ -20,7 +20,8 @@ export const LogisticsDashboard: React.FC = () => {
                 logisticsApi.getStats()
             ]);
             // Handle paginated response and array response
-            const trackingData = (trackingRes && Array.isArray(trackingRes)) ? trackingRes : (trackingRes?.tracking || []);
+            const resData = trackingRes as any;
+            const trackingData = (resData && Array.isArray(resData)) ? resData : (resData?.tracking || []);
             setTracking(trackingData);
 
             // Map backend stats to frontend display

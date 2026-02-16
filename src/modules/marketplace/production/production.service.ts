@@ -1,123 +1,131 @@
-import { prisma } from '../../../config/db';
-import { Prisma } from '../../../generated/prisma/client';
+import { db } from '../../../config/firebase';
 
 export class ProductionService {
-    /**
-     * Get all production logs with pagination
-     */
     async getAllLogs(page: number = 1, limit: number = 20) {
-        const skip = (page - 1) * limit;
+        const snap = await db.collection('productionLogs')
+            .orderBy('timestamp', 'desc')
+            .get();
 
-        const [logs, total] = await Promise.all([
-            prisma.productionLog.findMany({
-                skip,
-                take: limit,
-                include: {
-                    product: true,
-                    department: true,
-                },
-                orderBy: {
-                    timestamp: 'desc',
-                },
-            }),
-            prisma.productionLog.count(),
-        ]);
+        const allLogs: any[] = [];
+        for (const doc of snap.docs) {
+            const log = { id: doc.id, ...doc.data() } as any;
+
+            // Fetch product
+            if (log.productId) {
+                const productDoc = await db.collection('products').doc(log.productId).get();
+                log.product = productDoc.exists ? { id: productDoc.id, ...productDoc.data() } : null;
+            }
+
+            // Fetch department
+            if (log.departmentId) {
+                const deptDoc = await db.collection('departments').doc(log.departmentId).get();
+                log.department = deptDoc.exists ? { id: deptDoc.id, ...deptDoc.data() } : null;
+            }
+
+            allLogs.push(log);
+        }
+
+        const total = allLogs.length;
+        const start = (page - 1) * limit;
+        const logs = allLogs.slice(start, start + limit);
 
         return {
             logs,
-            pagination: {
-                page,
-                limit,
-                total,
-                totalPages: Math.ceil(total / limit),
-            },
+            pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
         };
     }
 
-    /**
-     * Create a new production log
-     */
     async createLog(data: {
-        productId: number;
-        departmentId?: number;
+        productId: string;
+        departmentId?: string;
         batchNumber: string;
         quantityProduced: number;
         notes?: string;
     }) {
-        // Use a transaction to update inventory as well
-        return await prisma.$transaction(async (tx) => {
-            const log = await tx.productionLog.create({
-                data: {
-                    productId: data.productId,
-                    departmentId: data.departmentId ?? null,
-                    batchNumber: data.batchNumber,
-                    quantityProduced: data.quantityProduced,
-                    notes: data.notes ?? null,
-                },
-                include: {
-                    product: true,
-                    department: true,
-                },
+        return await db.runTransaction(async (transaction) => {
+            // Create the log
+            const logRef = db.collection('productionLogs').doc();
+            transaction.set(logRef, {
+                productId: data.productId,
+                departmentId: data.departmentId || null,
+                batchNumber: data.batchNumber,
+                quantityProduced: data.quantityProduced,
+                timestamp: new Date(),
+                notes: data.notes || null,
             });
 
             // Update inventory
-            // Check if inventory record adheres exists
-            const inventory = await tx.inventory.findUnique({
-                where: { productId: data.productId },
-            });
+            const invSnap = await transaction.get(
+                db.collection('inventory').where('productId', '==', data.productId).limit(1)
+            );
 
-            if (inventory) {
-                await tx.inventory.update({
-                    where: { productId: data.productId },
-                    data: {
-                        quantityOnHand: {
-                            increment: data.quantityProduced,
-                        },
-                    },
+            if (!invSnap.empty) {
+                const invDoc = invSnap.docs[0];
+                const currentQty = invDoc.data().quantityOnHand || 0;
+                transaction.update(invDoc.ref, {
+                    quantityOnHand: currentQty + data.quantityProduced,
                 });
             } else {
-                // Create inventory record if not exists
-                await tx.inventory.create({
-                    data: {
-                        productId: data.productId,
-                        quantityOnHand: data.quantityProduced,
-                        location: 'Warehouse A', // Default
-                    },
+                // Create inventory record
+                const invRef = db.collection('inventory').doc();
+                transaction.set(invRef, {
+                    productId: data.productId,
+                    quantityOnHand: data.quantityProduced,
+                    location: 'Warehouse A',
+                    reorderLevel: 0,
                 });
             }
 
-            return log;
+            // Fetch related data for response
+            const productDoc = await transaction.get(db.collection('products').doc(data.productId));
+            const product = productDoc.exists ? { id: productDoc.id, ...productDoc.data() } : null;
+
+            let department = null;
+            if (data.departmentId) {
+                const deptDoc = await transaction.get(db.collection('departments').doc(data.departmentId));
+                department = deptDoc.exists ? { id: deptDoc.id, ...deptDoc.data() } : null;
+            }
+
+            return {
+                id: logRef.id,
+                productId: data.productId,
+                departmentId: data.departmentId || null,
+                batchNumber: data.batchNumber,
+                quantityProduced: data.quantityProduced,
+                timestamp: new Date(),
+                notes: data.notes || null,
+                product,
+                department,
+            };
         });
     }
 
-    /**
-     * Get production stats
-     */
     async getStats() {
-        const [totalLogs, totalQuantity] = await Promise.all([
-            prisma.productionLog.count(),
-            prisma.productionLog.aggregate({
-                _sum: {
-                    quantityProduced: true,
-                },
-            }),
-        ]);
+        const snap = await db.collection('productionLogs').get();
+        let totalLogs = 0;
+        let totalQuantity = 0;
 
-        // Get recent logs (last 5)
-        const recentLogs = await prisma.productionLog.findMany({
-            take: 5,
-            orderBy: {
-                timestamp: 'desc',
-            },
-            include: {
-                product: true,
-            },
+        snap.docs.forEach(doc => {
+            totalLogs++;
+            totalQuantity += Number(doc.data().quantityProduced || 0);
         });
 
-        return {
-            totalLogs,
-            totalQuantity: totalQuantity._sum.quantityProduced || 0,
-            recentLogs,
-        };
+        // Get recent logs (last 5)
+        const recentSnap = await db.collection('productionLogs')
+            .orderBy('timestamp', 'desc')
+            .limit(5)
+            .get();
+
+        const recentLogs: any[] = [];
+        for (const doc of recentSnap.docs) {
+            const log = { id: doc.id, ...doc.data() } as any;
+            if (log.productId) {
+                const productDoc = await db.collection('products').doc(log.productId).get();
+                log.product = productDoc.exists ? { id: productDoc.id, ...productDoc.data() } : null;
+            }
+            recentLogs.push(log);
+        }
+
+        return { totalLogs, totalQuantity, recentLogs };
     }
 }

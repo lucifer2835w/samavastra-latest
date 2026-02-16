@@ -1,5 +1,5 @@
 export interface JwtPayload {
-    id: number;
+    id: string;
     roles: string[];
 }
 export declare function signJwt(payload: JwtPayload, expiresIn?: number | string): string;

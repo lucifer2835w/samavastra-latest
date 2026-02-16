@@ -8,13 +8,15 @@ export class AdminController {
 
     async getAllUsers(req: Request, res: Response, next: NextFunction) {
         try {
-            const { role, search, status } = req.query;
-            const users = await adminService.getAllUsers({
-                role: role as string,
-                search: search as string,
-                status: status as string
-            });
-            res.json(users);
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 20;
+            const role = req.query.role as string | undefined;
+            const search = req.query.search as string | undefined;
+            const departmentId = req.query.departmentId as string | undefined;
+            const isActive = req.query.status === 'active' ? true : req.query.status === 'inactive' ? false : undefined;
+
+            const result = await adminService.getAllUsers(page, limit, search, role, departmentId, isActive);
+            res.json(result);
         } catch (error) {
             next(error);
         }
@@ -22,10 +24,9 @@ export class AdminController {
 
     async getUserById(req: Request, res: Response, next: NextFunction) {
         try {
-            const paramId = req.params.id;
-            if (!paramId) return res.status(400).json({ message: "User ID required" });
+            const id = req.params.id as string;
+            if (!id) return res.status(400).json({ message: "User ID required" });
 
-            const id = parseInt(paramId as string);
             const user = await adminService.getUserById(id);
 
             if (!user) {
@@ -40,11 +41,11 @@ export class AdminController {
 
     async createUser(req: Request, res: Response, next: NextFunction) {
         try {
-            const { email, password, firstName, lastName, phone, roles } = req.body;
+            const { email, password, firstName, lastName, phone, roles, departmentId } = req.body;
 
-            if (!email || !password || !firstName || !lastName || !roles) {
+            if (!email || !password || !firstName || !lastName) {
                 return res.status(400).json({
-                    message: 'Email, password, firstName, lastName, and roles are required'
+                    message: 'Email, password, firstName, and lastName are required'
                 });
             }
 
@@ -54,31 +55,29 @@ export class AdminController {
                 firstName,
                 lastName,
                 phone,
-                roles
+                departmentId,
+                roleNames: roles,
             });
 
             res.status(201).json(user);
         } catch (error: any) {
-            if (error.code === 'P2002') {
-                return res.status(409).json({ message: 'Email already exists' });
-            }
             next(error);
         }
     }
 
     async updateUser(req: Request, res: Response, next: NextFunction) {
         try {
-            const paramId = req.params.id;
-            if (!paramId) return res.status(400).json({ message: "User ID required" });
+            const id = req.params.id as string;
+            if (!id) return res.status(400).json({ message: "User ID required" });
 
-            const id = parseInt(paramId as string);
-            const { email, firstName, lastName, phone } = req.body;
+            const { firstName, lastName, phone, departmentId, isActive } = req.body;
 
             const user = await adminService.updateUser(id, {
-                email,
                 firstName,
                 lastName,
-                phone
+                phone,
+                departmentId,
+                isActive,
             });
 
             res.json(user);
@@ -89,17 +88,20 @@ export class AdminController {
 
     async assignRoles(req: Request, res: Response, next: NextFunction) {
         try {
-            const paramId = req.params.id;
-            if (!paramId) return res.status(400).json({ message: "User ID required" });
+            const userId = req.params.id as string;
+            if (!userId) return res.status(400).json({ message: "User ID required" });
 
-            const userId = parseInt(paramId as string);
             const { roles } = req.body;
 
             if (!roles || !Array.isArray(roles)) {
                 return res.status(400).json({ message: 'Roles array is required' });
             }
 
-            const user = await adminService.assignRoles(userId, roles);
+            // Assign roles one by one
+            let user;
+            for (const roleId of roles) {
+                user = await adminService.assignRole(userId, roleId);
+            }
             res.json(user);
         } catch (error) {
             next(error);
@@ -108,10 +110,9 @@ export class AdminController {
 
     async deactivateUser(req: Request, res: Response, next: NextFunction) {
         try {
-            const paramId = req.params.id;
-            if (!paramId) return res.status(400).json({ message: "User ID required" });
+            const userId = req.params.id as string;
+            if (!userId) return res.status(400).json({ message: "User ID required" });
 
-            const userId = parseInt(paramId as string);
             await adminService.deactivateUser(userId);
             res.json({ message: 'User deactivated successfully' });
         } catch (error) {
@@ -121,17 +122,22 @@ export class AdminController {
 
     async resetPassword(req: Request, res: Response, next: NextFunction) {
         try {
-            const paramId = req.params.id;
-            if (!paramId) return res.status(400).json({ message: "User ID required" });
+            const userId = req.params.id as string;
+            if (!userId) return res.status(400).json({ message: "User ID required" });
 
-            const userId = parseInt(paramId as string);
             const { newPassword } = req.body;
 
             if (!newPassword) {
                 return res.status(400).json({ message: 'New password is required' });
             }
 
-            await adminService.resetPassword(userId, newPassword);
+            // Reset password by directly updating the hash
+            const bcrypt = await import('bcrypt');
+            const { env } = await import('../../config/env');
+            const hash = await bcrypt.hash(newPassword, env.bcryptRounds);
+            const { db } = await import('../../config/firebase');
+            await db.collection('users').doc(userId).update({ passwordHash: hash, updatedAt: new Date() });
+
             res.json({ message: 'Password reset successfully' });
         } catch (error) {
             next(error);
@@ -149,20 +155,10 @@ export class AdminController {
         }
     }
 
-    async getEnrollmentTrends(req: Request, res: Response, next: NextFunction) {
+    async getRoles(req: Request, res: Response, next: NextFunction) {
         try {
-            const months = req.query.months ? parseInt(req.query.months as string) : 6;
-            const trends = await adminService.getEnrollmentTrends(months);
-            res.json(trends);
-        } catch (error) {
-            next(error);
-        }
-    }
-
-    async getClassDistribution(req: Request, res: Response, next: NextFunction) {
-        try {
-            const distribution = await adminService.getClassDistribution();
-            res.json(distribution);
+            const roles = await adminService.getRoles();
+            res.json(roles);
         } catch (error) {
             next(error);
         }

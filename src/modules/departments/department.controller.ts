@@ -32,7 +32,7 @@ export class DepartmentController {
 
     async getDepartment(req: Request, res: Response, next: NextFunction) {
         try {
-            const id = parseInt(req.params.id as string);
+            const id = req.params.id as string;
             const department = await departmentService.getDepartmentById(id);
             if (!department) {
                 return res.status(404).json({ message: 'Department not found' });

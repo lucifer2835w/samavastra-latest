@@ -1,7 +1,16 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
-import { authApi } from '../api';
 import type { User } from '../types';
+
+// TEMPORARY: Auth bypassed — all users are auto-authenticated
+const MOCK_USER: User = {
+    id: 'demo-user-001',
+    email: 'admin@samavest.com',
+    firstName: 'Demo',
+    lastName: 'User',
+    roles: ['ADMIN', 'STUDENT', 'TEACHER'],
+    isActive: true,
+} as any;
 
 interface AuthContextType {
     user: User | null;
@@ -15,44 +24,16 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    const [user, setUser] = useState<User | null>(null);
-    const [token, setToken] = useState<string | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
+    const [user] = useState<User | null>(MOCK_USER);
+    const [token] = useState<string | null>('demo-token');
+    const [isLoading] = useState(false);
 
-    useEffect(() => {
-        // Load user and token from localStorage on mount
-        const storedToken = localStorage.getItem('token');
-        const storedUser = localStorage.getItem('user');
-
-        if (storedToken && storedUser) {
-            setToken(storedToken);
-            setUser(JSON.parse(storedUser));
-        }
-        setIsLoading(false);
-    }, []);
-
-    const login = async (email: string, password: string) => {
-        console.log('Attempting login for:', email);
-        try {
-            const response = await authApi.login({ email, password });
-            console.log('Login response:', response);
-            setToken(response.token);
-            setUser(response.user);
-            localStorage.setItem('token', response.token);
-            localStorage.setItem('user', JSON.stringify(response.user));
-            console.log('Login successful!');
-        } catch (error: any) {
-            console.error('Login failed:', error);
-            console.error('Error response:', error.response?.data);
-            throw error;
-        }
+    const login = async (_email: string, _password: string) => {
+        // No-op: already authenticated
     };
 
     const logout = () => {
-        setToken(null);
-        setUser(null);
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+        // No-op in demo mode
     };
 
     return (
@@ -62,8 +43,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 token,
                 login,
                 logout,
-                isAuthenticated: !!token,
-                isLoading,
+                isAuthenticated: true,
+                isLoading: false,
             }}
         >
             {children}

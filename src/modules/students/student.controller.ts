@@ -24,8 +24,8 @@ export class StudentController {
                 lastName,
                 email,
                 studentNumber,
-                classId: classId ? parseInt(classId) : undefined,
-                parentId: parentId ? parseInt(parentId) : undefined,
+                classId: classId || undefined,
+                parentId: parentId || undefined,
                 phone: phone || null,
                 passwordHash,
             });
@@ -59,7 +59,7 @@ export class StudentController {
 
     async getStudent(req: Request, res: Response, next: NextFunction) {
         try {
-            const id = parseInt(req.params.id as string);
+            const id = req.params.id as string;
             const student = await studentService.getStudentById(id);
             if (!student) {
                 return res.status(404).json({ message: 'Student not found' });
@@ -74,7 +74,7 @@ export class StudentController {
         try {
             const page = parseInt(req.query.page as string) || 1;
             const limit = parseInt(req.query.limit as string) || 20;
-            const classId = req.query.classId ? parseInt(req.query.classId as string) : undefined;
+            const classId = req.query.classId ? (req.query.classId as string) : undefined;
 
             const result = await studentService.getAllStudents(page, limit, classId);
             res.json(result);
@@ -85,7 +85,7 @@ export class StudentController {
 
     async updateStudent(req: Request, res: Response, next: NextFunction) {
         try {
-            const id = parseInt(req.params.id as string);
+            const id = req.params.id as string;
             const { classId, parentId, status } = req.body;
 
             const student = await studentService.updateStudent(id, {
