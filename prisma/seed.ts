@@ -64,7 +64,7 @@ async function main() {
 
     // Create Admin User
     console.log('👤 Creating admin user...');
-    const adminPasswordHash = await bcrypt.hash('admin123', 10);
+    const adminPasswordHash = await bcrypt.hash('12345678', 10);
     const adminUser = await prisma.user.create({
         data: {
             email: 'admin@samavest.com',
@@ -82,7 +82,7 @@ async function main() {
 
     // Create Staff Users
     console.log('👔 Creating staff users...');
-    const staffPasswordHash = await bcrypt.hash('staff123', 10);
+    const staffPasswordHash = await bcrypt.hash('12345678', 10);
     const financeStaff = await prisma.user.create({
         data: {
             email: 'finance@samavest.com',
@@ -99,7 +99,7 @@ async function main() {
 
     // Create Student Users
     console.log('🎓 Creating student users...');
-    const studentPasswordHash = await bcrypt.hash('student123', 10);
+    const studentPasswordHash = await bcrypt.hash('12345678', 10);
 
     const student1User = await prisma.user.create({
         data: {
@@ -143,7 +143,7 @@ async function main() {
 
     // Create Parent User
     console.log('👨‍👩‍👧 Creating parent user...');
-    const parentPasswordHash = await bcrypt.hash('parent123', 10);
+    const parentPasswordHash = await bcrypt.hash('12345678', 10);
     const parentUser = await prisma.user.create({
         data: {
             email: 'parent@chalkboard.com',
@@ -159,7 +159,7 @@ async function main() {
 
     // Create Teacher User
     console.log('👩‍🏫 Creating teacher user...');
-    const teacherPasswordHash = await bcrypt.hash('teacher123', 10);
+    const teacherPasswordHash = await bcrypt.hash('12345678', 10);
     const teacherUser = await prisma.user.create({
         data: {
             email: 'jane.smith@school.com',
@@ -175,7 +175,7 @@ async function main() {
 
     // Create School Admin User
     console.log('🏫 Creating school admin user...');
-    const schoolAdminPasswordHash = await bcrypt.hash('admin123', 10);
+    const schoolAdminPasswordHash = await bcrypt.hash('12345678', 10);
     const schoolAdminUser = await prisma.user.create({
         data: {
             email: 'admin@school.com',
@@ -457,13 +457,13 @@ async function main() {
     console.log(`   - Attendance Records: 7`);
     console.log(`   - Production Logs: 2`);
     console.log('\n🔑 Test Credentials:');
-    console.log('   Admin: admin@samavest.com / admin123');
-    console.log('   Student 1: john.doe@chalkboard.com / student123');
-    console.log('   Student 2: jane.smith@chalkboard.com / student123');
-    console.log('   Parent: parent@chalkboard.com / parent123');
-    console.log('   Staff: finance@samavest.com / staff123');
-    console.log('   Teacher: jane.smith@school.com / teacher123');
-    console.log('   School Admin: admin@school.com / admin123');
+    console.log('   Admin: admin@samavest.com / 12345678');
+    console.log('   Student 1: john.doe@chalkboard.com / 12345678');
+    console.log('   Student 2: jane.smith@chalkboard.com / 12345678');
+    console.log('   Parent: parent@chalkboard.com / 12345678');
+    console.log('   Staff: finance@samavest.com / 12345678');
+    console.log('   Teacher: jane.smith@school.com / 12345678');
+    console.log('   School Admin: admin@school.com / 12345678');
 }
 
 main()

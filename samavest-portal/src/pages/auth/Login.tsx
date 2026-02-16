@@ -66,10 +66,12 @@ export const Login: React.FC = () => {
                 </form>
 
                 <div className="demo-credentials">
-                    <p><strong>Demo Credentials:</strong></p>
-                    <p>Admin: admin@samavest.com / admin123</p>
-                    <p>Staff: finance@samavest.com / staff123</p>
+                    <p><strong>Demo Logins (Password: 12345678)</strong></p>
+                    <p>Admin: admin@samavest.com</p>
+                    <p>Staff: finance@samavest.com</p>
                 </div>
+
+
             </div>
         </div>
     );

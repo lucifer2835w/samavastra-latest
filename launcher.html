@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Samavest Project Launcher</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify_content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+            background-color: white;
+            padding: 3rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            max-width: 600px;
+            width: 100%;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 2rem;
+        }
+        .button-group {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .launch-btn {
+            display: inline-block;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: 600;
+            text-decoration: none;
+            color: white;
+            border-radius: 8px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            width: 200px;
+        }
+        .launch-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        .samavest-btn {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        }
+        .chalkboard-btn {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+        p {
+            color: #666;
+            margin-top: 2rem;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Select Portal to Launch</h1>
+        <div class="button-group">
+            <a href="http://localhost:5173" class="launch-btn samavest-btn" target="_blank">
+                Samavest Portal
+                <div style="font-size: 12px; font-weight: normal; margin-top: 5px;">Internal ERP</div>
+            </a>
+            <a href="http://localhost:5174" class="launch-btn chalkboard-btn" target="_blank">
+                Chalkboard Portal
+                <div style="font-size: 12px; font-weight: normal; margin-top: 5px;">Student & Market</div>
+            </a>
+        </div>
+        <p>Please ensure the command prompt windows remain open while using the application.</p>
+    </div>
+</body>
+</html>

@@ -15,8 +15,8 @@ export class StudentController {
                 return res.status(400).json({ message: 'Missing required fields' });
             }
 
-            // Default password generation (e.g., student123)
-            const defaultPassword = 'student123';
+            // Default password generation
+            const defaultPassword = '12345678';
             const passwordHash = await hashPassword(defaultPassword);
 
             const student = await studentService.createStudentWithUser({

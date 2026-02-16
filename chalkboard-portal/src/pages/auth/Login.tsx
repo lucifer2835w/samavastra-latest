@@ -70,20 +70,22 @@ export const Login: React.FC = () => {
                     </form>
 
                     <div className="login-demo">
-                        <p><strong>Demo Credentials:</strong></p>
+                        <p><strong>Demo Logins (Password: 12345678)</strong></p>
                         <div style={{ marginBottom: '0.5rem' }}>
                             <small>Teacher:</small><br />
-                            <code>jane.smith@school.com / teacher123</code>
+                            <code>jane.smith@school.com</code>
                         </div>
                         <div style={{ marginBottom: '0.5rem' }}>
                             <small>School Admin:</small><br />
-                            <code>admin@school.com / admin123</code>
+                            <code>admin@school.com</code>
                         </div>
                         <div>
                             <small>Student:</small><br />
-                            <code>john.doe@chalkboard.com / student123</code>
+                            <code>john.doe@chalkboard.com</code>
                         </div>
                     </div>
+
+
                 </Card>
             </div>
         </div>
