@@ -1,0 +1,25 @@
+.dashboard-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+.main-content {
+    flex: 1;
+    margin-left: 250px;
+    /* Width of sidebar */
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    /* Prevent flex child from overflowing */
+}
+
+.page-content {
+    padding: 2rem;
+    flex: 1;
+    background-color: var(--bg-color, #f8fafc);
+}
+
+/* Adjust Header to not be fixed or full width if inside main-content? 
+   Existing Header styles might conflict. We should check Header.css.
+   If Header is fixed, we need to adjust margin-top of page-content.
+*/

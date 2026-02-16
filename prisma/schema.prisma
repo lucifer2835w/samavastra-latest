@@ -1,0 +1,328 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           Int         @id @default(autoincrement())
+  email        String      @unique
+  passwordHash String
+  firstName    String
+  lastName     String
+  phone        String?
+  isActive     Boolean     @default(true)
+  departmentId Int?
+  department   Department? @relation(fields: [departmentId], references: [id])
+  roles        UserRole[]
+
+  // ERP Relations
+  student Student?
+  teacher Teacher?
+  parent  Parent?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  sentNotifications     Notification[] @relation("SentNotifications")
+  receivedNotifications Notification[] @relation("ReceivedNotifications")
+}
+
+model Role {
+  id          Int        @id @default(autoincrement())
+  name        String     @unique // SUPER_ADMIN, ADMIN, TEACHER, STUDENT, PARENT
+  description String?
+  users       UserRole[]
+}
+
+model UserRole {
+  userId Int
+  roleId Int
+  user   User @relation(fields: [userId], references: [id])
+  role   Role @relation(fields: [roleId], references: [id])
+
+  @@id([userId, roleId])
+}
+
+// --- ACADEMICS MODULE ---
+
+model Class {
+  id        Int    @id @default(autoincrement())
+  grade     String
+  section   String
+  teacherId Int? // Class Teacher
+
+  teacher  Teacher?  @relation(fields: [teacherId], references: [id])
+  students Student[]
+  subjects Subject[] // Subjects taught in this class
+
+  @@unique([grade, section])
+}
+
+model Subject {
+  id          Int     @id @default(autoincrement())
+  name        String
+  code        String  @unique
+  description String?
+
+  classes  Class[]
+  teachers Teacher[] // Teachers who can teach this subject
+  exams    Exam[]
+  homework Homework[]
+}
+
+model Student {
+  id            Int    @id @default(autoincrement())
+  userId        Int    @unique
+  studentNumber String @unique
+  classId       Int?
+  parentId      Int?
+  status        String @default("ACTIVE") // ACTIVE, ALUMNI, SUSPENDED
+
+  user   User    @relation(fields: [userId], references: [id])
+  class  Class?  @relation(fields: [classId], references: [id])
+  parent Parent? @relation(fields: [parentId], references: [id])
+
+  orders              Order[]
+  attendance          Attendance[]
+  results             ExamResult[]
+  homeworkSubmissions HomeworkSubmission[]
+  fees                Fee[]
+  parentAccess        ParentAccess[]
+}
+
+model Teacher {
+  id            Int     @id @default(autoincrement())
+  userId        Int     @unique
+  employeeId    String  @unique
+  qualification String?
+
+  user     User      @relation(fields: [userId], references: [id])
+  classes  Class[] // Classes where they are class teacher
+  subjects Subject[] // Subjects they teach
+}
+
+model Parent {
+  id     Int @id @default(autoincrement())
+  userId Int @unique
+
+  user         User           @relation(fields: [userId], references: [id])
+  students     Student[]
+  parentAccess ParentAccess[]
+}
+
+model Attendance {
+  id        Int      @id @default(autoincrement())
+  studentId Int
+  date      DateTime
+  status    String // PRESENT, ABSENT, LATE, EXCUSED
+  remarks   String?
+
+  student Student @relation(fields: [studentId], references: [id])
+
+  @@unique([studentId, date])
+}
+
+model Homework {
+  id          Int      @id @default(autoincrement())
+  subjectId   Int
+  title       String
+  description String?
+  dueDate     DateTime
+
+  subject     Subject              @relation(fields: [subjectId], references: [id])
+  submissions HomeworkSubmission[]
+  
+  @@index([subjectId])
+  @@index([dueDate])
+}
+
+model HomeworkSubmission {
+  id          Int      @id @default(autoincrement())
+  homeworkId  Int
+  studentId   Int
+  content     String?
+  fileUrl     String?
+  submittedAt DateTime @default(now())
+  grade       String?
+
+  homework Homework @relation(fields: [homeworkId], references: [id])
+  student  Student  @relation(fields: [studentId], references: [id])
+  
+  @@index([studentId])
+  @@index([homeworkId])
+}
+
+model ParentAccess {
+  id                Int     @id @default(autoincrement())
+  parentId          Int
+  studentId         Int
+  canViewGrades     Boolean @default(true)
+  canViewAttendance Boolean @default(true)
+  canViewFees       Boolean @default(true)
+  canViewHomework   Boolean @default(true)
+
+  parent  Parent  @relation(fields: [parentId], references: [id])
+  student Student @relation(fields: [studentId], references: [id])
+
+  @@unique([parentId, studentId])
+}
+
+model Exam {
+  id        Int      @id @default(autoincrement())
+  subjectId Int
+  name      String
+  date      DateTime
+  maxMarks  Int
+
+  subject Subject      @relation(fields: [subjectId], references: [id])
+  results ExamResult[]
+}
+
+model ExamResult {
+  id            Int     @id @default(autoincrement())
+  examId        Int
+  studentId     Int
+  marksObtained Decimal
+  grade         String?
+
+  exam    Exam    @relation(fields: [examId], references: [id])
+  student Student @relation(fields: [studentId], references: [id])
+
+  @@unique([examId, studentId])
+}
+
+// --- COMMUNICATIONS & FINANCE ---
+
+model Notification {
+  id          Int      @id @default(autoincrement())
+  title       String
+  message     String
+  type        String   // CIRCULAR, ASSIGNMENT, FEE, GENERAL
+  senderId    Int
+  recipientId Int?     // Optional if broadcast
+  targetRole  String?  // STUDENT, TEACHER, ALL (if broadcast)
+  classId     Int?     // Optional for class-specific broadcasts
+  isRead      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  sender    User   @relation("SentNotifications", fields: [senderId], references: [id])
+  recipient User?  @relation("ReceivedNotifications", fields: [recipientId], references: [id])
+}
+
+model Fee {
+  id             Int       @id @default(autoincrement())
+  studentId      Int
+  title          String    // e.g., "Tuition Fee Term 1"
+  amount         Decimal
+  dueDate        DateTime
+  status         String    // PENDING, PAID, OVERDUE
+  paymentDate    DateTime?
+  transactionRef String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  student Student @relation(fields: [studentId], references: [id])
+}
+
+// --- DEPARTMENTS / MARKETPLACE ---
+
+model Department {
+  id             Int             @id @default(autoincrement())
+  code           String          @unique
+  name           String // HR, ACCOUNTS, LOGISTICS, etc.
+  users          User[]
+  productionLogs ProductionLog[]
+}
+
+model Product {
+  id          Int             @id @default(autoincrement())
+  sku         String          @unique
+  name        String
+  description String?
+  price       Decimal
+  isActive    Boolean         @default(true)
+  inventory   Inventory?
+  orderItems  OrderItem[]
+  production  ProductionLog[]
+}
+
+model Order {
+  id          Int      @id @default(autoincrement())
+  studentId   Int
+  status      String
+  totalAmount Decimal
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  student   Student             @relation(fields: [studentId], references: [id])
+  items     OrderItem[]
+  payments  Payment[]
+  logistics LogisticsTracking[]
+}
+
+model OrderItem {
+  id        Int     @id @default(autoincrement())
+  orderId   Int
+  productId Int
+  quantity  Int
+  unitPrice Decimal
+
+  order   Order   @relation(fields: [orderId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+}
+
+model Inventory {
+  id             Int     @id @default(autoincrement())
+  productId      Int     @unique
+  location       String?
+  quantityOnHand Int     @default(0)
+  reorderLevel   Int     @default(0)
+
+  product Product @relation(fields: [productId], references: [id])
+}
+
+model ProductionLog {
+  id               Int      @id @default(autoincrement())
+  productId        Int
+  departmentId     Int?
+  batchNumber      String
+  quantityProduced Int
+  timestamp        DateTime @default(now())
+  notes            String?
+
+  product    Product     @relation(fields: [productId], references: [id])
+  department Department? @relation(fields: [departmentId], references: [id])
+}
+
+model LogisticsTracking {
+  id                Int       @id @default(autoincrement())
+  orderId           Int
+  trackingNumber    String    @unique
+  status            String
+  estimatedDelivery DateTime?
+  actualDelivery    DateTime?
+
+  order Order @relation(fields: [orderId], references: [id])
+}
+
+model Payment {
+  id                   Int       @id @default(autoincrement())
+  orderId              Int
+  amount               Decimal
+  status               String
+  paymentMethod        String
+  transactionReference String?
+  paidAt               DateTime?
+
+  order Order @relation(fields: [orderId], references: [id])
+}

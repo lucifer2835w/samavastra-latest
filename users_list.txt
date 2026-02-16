@@ -1,0 +1,7 @@
+User: admin@samavest.com | ID: 11 | Roles: ADMIN
+User: finance@samavest.com | ID: 12 | Roles: STAFF
+User: john.doe@chalkboard.com | ID: 13 | Roles: STUDENT
+User: jane.smith@chalkboard.com | ID: 14 | Roles: STUDENT
+User: parent@chalkboard.com | ID: 15 | Roles: PARENT
+User: jane.smith@school.com | ID: 16 | Roles: TEACHER
+User: admin@school.com | ID: 17 | Roles: SCHOOL_ADMIN

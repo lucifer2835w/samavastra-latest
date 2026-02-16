@@ -1,0 +1,41 @@
+🌱 Starting database seed...
+🧹 Cleaning existing data...
+👥 Creating roles...
+🏢 Creating departments...
+👤 Creating admin user...
+👔 Creating staff users...
+🎓 Creating student users...
+❌ Error seeding database: PrismaClientValidationError: 
+Invalid `prisma.student.create()` invocation in
+C:\samvasta\prisma\seed.ts:110:43
+
+  107 await prisma.userRole.create({
+  108     data: { userId: student1User.id, roleId: studentRole.id },
+  109 });
+→ 110 const student1 = await prisma.student.create({
+        data: {
+          userId: 3,
+          studentNumber: "STU001",
+          grade: "10",
+          ~~~~~
+          status: "ACTIVE",
+      ?   id?: Int,
+      ?   classId?: Int | Null,
+      ?   parentId?: Int | Null,
+      ?   orders?: OrderUncheckedCreateNestedManyWithoutStudentInput,
+      ?   attendance?: AttendanceUncheckedCreateNestedManyWithoutStudentInput,
+      ?   results?: ExamResultUncheckedCreateNestedManyWithoutStudentInput,
+      ?   homeworkSubmissions?: HomeworkSubmissionUncheckedCreateNestedManyWithoutStudentInput
+        }
+      })
+
+Unknown argument `grade`. Available options are marked with ?.
+    at throwValidationException (C:\samvasta\node_modules\@prisma\client\src\runtime\core\errorRendering\throwValidationException.ts:46:9)
+    at Vr.handleRequestError (C:\samvasta\node_modules\@prisma\client\src\runtime\RequestHandler.ts:202:7)
+    at Vr.handleAndLogRequestError (C:\samvasta\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at Vr.request (C:\samvasta\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async a (C:\samvasta\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:805:24)
+    at async main (C:\samvasta\prisma\seed.ts:110:22) {
+  clientVersion: '7.3.0'
+}

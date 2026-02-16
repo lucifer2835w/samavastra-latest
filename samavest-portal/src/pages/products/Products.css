@@ -1,0 +1,22 @@
+.product-name {
+    font-weight: 500;
+}
+
+.product-desc {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    max-width: 300px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.low-stock-indicator {
+    margin-left: var(--spacing-xs);
+    cursor: help;
+}
+
+.delete-btn:hover {
+    color: var(--danger);
+    background-color: #FEE2E2;
+}
