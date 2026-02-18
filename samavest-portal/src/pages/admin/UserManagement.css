@@ -35,7 +35,7 @@
 .users-table {
     width: 100%;
     border-collapse: collapse;
-    background: white;
+    background: var(--bg-panel);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
     overflow: hidden;
@@ -132,7 +132,7 @@
 }
 
 .modal {
-    background: white;
+    background: var(--bg-panel);
     padding: 2rem;
     border-radius: 8px;
     max-width: 500px;

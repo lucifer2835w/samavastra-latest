@@ -11,7 +11,7 @@
 }
 
 .filters-section {
-    background: white;
+    background: var(--bg-panel);
     padding: var(--spacing-md);
     border-radius: var(--border-radius);
     border: 1px solid var(--border-color);

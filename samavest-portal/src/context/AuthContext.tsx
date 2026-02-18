@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import type { User } from '../types';
 
@@ -24,16 +24,60 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    const [user] = useState<User | null>(MOCK_USER);
-    const [token] = useState<string | null>('demo-token');
-    const [isLoading] = useState(false);
+    const [user, setUser] = useState<User | null>(null);
+    const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
+    const [isLoading, setIsLoading] = useState(true);
 
-    const login = async (_email: string, _password: string) => {
-        // No-op: already authenticated
+    useEffect(() => {
+        const initAuth = async () => {
+            if (token) {
+                try {
+                    const res = await fetch('http://127.0.0.1:3000/api/auth/me', {
+                        headers: { Authorization: `Bearer ${token}` }
+                    });
+                    if (res.ok) {
+                        const userData = await res.json();
+                        setUser(userData);
+                    } else {
+                        logout();
+                    }
+                } catch (err) {
+                    console.error('Auth verification failed', err);
+                    logout();
+                }
+            }
+            setIsLoading(false);
+        };
+        initAuth();
+    }, [token]);
+
+    const login = async (email: string, password: string) => {
+        try {
+            const res = await fetch('http://127.0.0.1:3000/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password }),
+            });
+
+            if (!res.ok) {
+                const error = await res.json();
+                throw new Error(error.message || 'Login failed');
+            }
+
+            const data = await res.json();
+            localStorage.setItem('token', data.token);
+            setToken(data.token);
+            setUser(data.user);
+        } catch (error) {
+            console.error('Login error:', error);
+            throw error;
+        }
     };
 
     const logout = () => {
-        // No-op in demo mode
+        localStorage.removeItem('token');
+        setToken(null);
+        setUser(null);
     };
 
     return (
@@ -43,8 +87,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 token,
                 login,
                 logout,
-                isAuthenticated: true,
-                isLoading: false,
+                isAuthenticated: !!user,
+                isLoading,
             }}
         >
             {children}

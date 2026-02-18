@@ -30,7 +30,7 @@ export const Login: React.FC = () => {
         <div className="login-container">
             <div className="login-card">
                 <div className="login-header">
-                    <h1>Samavest ERP</h1>
+                    <h1>Samavastra ERP</h1>
                     <p>Admin & Staff Portal</p>
                 </div>
 
@@ -67,8 +67,8 @@ export const Login: React.FC = () => {
 
                 <div className="demo-credentials">
                     <p><strong>Demo Logins (Password: 12345678)</strong></p>
-                    <p>Admin: admin@samavest.com</p>
-                    <p>Staff: finance@samavest.com</p>
+                    <p>Admin: admin@samavastra.com</p>
+                    <p>Staff: finance@samavastra.com</p>
                 </div>
 
 

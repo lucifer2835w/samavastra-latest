@@ -1,6 +1,6 @@
 // Reuse types from Chalkboard portal
 export interface User {
-    id: number;
+    id: number | string;
     email: string;
     firstName: string;
     lastName: string;
@@ -8,7 +8,7 @@ export interface User {
 }
 
 export interface Role {
-    id: number;
+    id: number | string;
     name: string;
     description?: string;
 }
