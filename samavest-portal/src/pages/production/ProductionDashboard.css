@@ -17,7 +17,7 @@
 }
 
 .stat-card {
-    background: white;
+    background: var(--bg-panel);
     padding: 1.5rem;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
@@ -37,7 +37,7 @@
 }
 
 .dashboard-section {
-    background: white;
+    background: var(--bg-panel);
     border-radius: 8px;
     padding: 1.5rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
@@ -74,7 +74,7 @@
 }
 
 .modal-content {
-    background: white;
+    background: var(--bg-panel);
     padding: 2rem;
     border-radius: 8px;
     width: 100%;

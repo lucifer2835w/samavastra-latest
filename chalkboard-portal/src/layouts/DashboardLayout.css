@@ -1,25 +1,189 @@
 .dashboard-layout {
     display: flex;
+    flex-direction: column;
     min-height: 100vh;
+    background: var(--bg-app);
+}
+
+.top-bar {
+    position: sticky;
+    top: 1rem;
+    margin: 0 1rem;
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 1.5rem;
+    z-index: 100;
+    background: #ffffff;
+    border: 1px solid var(--border-subtle);
+    box-shadow: 0 4px 12px rgba(22, 163, 74, 0.08);
+    /* Subtle Green Shadow */
+}
+
+.brand-section {
+    display: flex;
+    align-items: center;
+}
+
+.brand-logo {
+    margin: 0;
+    font-size: 1.5rem;
+    letter-spacing: 0.05em;
+    font-weight: 800;
+    color: var(--primary);
+    /* Green Logo */
+}
+
+.top-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-full);
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s var(--ease-smooth);
+}
+
+.nav-item:hover {
+    color: var(--primary);
+    background: #f0fdf4;
+    /* Green 50 */
+}
+
+.nav-item.active {
+    background: var(--primary);
+    /* Solid Green */
+    color: white;
+    box-shadow: 0 4px 10px rgba(22, 163, 74, 0.3);
+}
+
+.nav-item span {
+    font-size: 1.1em;
+}
+
+.nav-divider {
+    width: 1px;
+    height: 24px;
+    background: var(--border-subtle);
+    margin: 0 0.5rem;
+}
+
+.user-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: #f0fdf4;
+    /* Green 50 */
+    padding: 0.25rem 0.75rem 0.25rem 0.25rem;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--border-subtle);
+}
+
+.avatar {
+    width: 32px;
+    height: 32px;
+    background: var(--primary);
+    border-radius: 50%;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 0.85rem;
+    border: 2px solid white;
+}
+
+.user-name {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.btn-icon {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s;
+    color: var(--text-muted);
+}
+
+.btn-icon:hover {
+    background: #f0fdf4;
+    color: var(--primary);
+}
+
+.btn-icon.logout:hover {
+    background: #fef2f2;
+    color: var(--error);
+}
+
+.cart-btn-wrapper {
+    position: relative;
+    text-decoration: none;
+    color: inherit;
+}
+
+.cart-badge {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    background: var(--error);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 700;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid white;
 }
 
 .main-content {
     flex: 1;
-    margin-left: 250px;
-    /* Width of sidebar */
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-    /* Prevent flex child from overflowing */
+    margin-top: 1rem;
+    padding: 1rem 2rem;
+    width: 100%;
 }
 
-.page-content {
-    padding: 2rem;
-    flex: 1;
-    background-color: var(--bg-color, #f8fafc);
+.page-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    animation: fadeIn 0.4s ease-out;
 }
 
-/* Adjust Header to not be fixed or full width if inside main-content? 
-   Existing Header styles might conflict. We should check Header.css.
-   If Header is fixed, we need to adjust margin-top of page-content.
-*/
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

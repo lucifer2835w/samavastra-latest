@@ -1,24 +1,27 @@
 import { Request, Response, NextFunction } from 'express';
-import { JwtPayload } from '../shared/utils/jwt';
+import { JwtPayload, verifyJwt } from '../shared/utils/jwt';
 
 export interface AuthenticatedRequest extends Request {
   user?: JwtPayload;
 }
 
-// TEMPORARY: Auth bypassed — always authenticated as admin
-const MOCK_USER_PAYLOAD: JwtPayload = {
-  id: 'demo-user-001',
-  email: 'admin@samavest.com',
-  userRole: 'ADMIN',
-  firstName: 'Demo',
-  lastName: 'User'
-} as any;
+
 
 export function authenticateJWT(req: AuthenticatedRequest, res: Response, next: NextFunction) {
-  console.log('TEMPORARY: Bypassing auth for request:', req.method, req.url);
+  const authHeader = req.headers.authorization;
 
-  // Set mock user on request
-  req.user = MOCK_USER_PAYLOAD;
+  if (authHeader) {
+    const token = authHeader.split(' ')[1]; // Bearer <token>
 
-  return next();
+    try {
+      const user = verifyJwt(token);
+      req.user = user;
+      next();
+    } catch (error) {
+      console.error('JWT Verification Error:', error);
+      res.sendStatus(403); // Forbidden
+    }
+  } else {
+    res.sendStatus(401); // Unauthorized
+  }
 }

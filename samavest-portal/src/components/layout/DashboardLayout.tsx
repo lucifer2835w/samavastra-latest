@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import './DashboardLayout.css';
 
@@ -10,70 +10,65 @@ interface DashboardLayoutProps {
 export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
 
     const handleLogout = () => {
         logout();
         navigate('/login');
     };
 
+    const isActive = (path: string) => location.pathname.startsWith(path) ? 'nav-item active' : 'nav-item';
+
     return (
         <div className="dashboard-layout">
-            <aside className="sidebar">
-                <div className="sidebar-header">
-                    <h2>Samavest ERP</h2>
+            <header className="top-bar glass-panel">
+                <div className="brand-section">
+                    <h2 className="brand-logo gradient-text-gold">SAMAVASTRA</h2>
                 </div>
 
-                <nav className="sidebar-nav">
-                    <Link to="/dashboard" className="nav-item">
+                <nav className="top-nav">
+                    <Link to="/dashboard" className={isActive('/dashboard')}>
                         <span>📊</span> Dashboard
                     </Link>
-                    <Link to="/students" className="nav-item">
+                    <Link to="/students" className={isActive('/students')}>
                         <span>👥</span> Students
                     </Link>
-                    <Link to="/products" className="nav-item">
+                    <Link to="/products" className={isActive('/products')}>
                         <span>📦</span> Products
                     </Link>
-                    <Link to="/inventory" className="nav-item">
+                    <Link to="/inventory" className={isActive('/inventory')}>
                         <span>📋</span> Inventory
                     </Link>
-                    <Link to="/orders" className="nav-item">
+                    <Link to="/orders" className={isActive('/orders')}>
                         <span>🛒</span> Orders
                     </Link>
-                    <Link to="/logistics" className="nav-item">
+                    <Link to="/logistics" className={isActive('/logistics')}>
                         <span>🚚</span> Logistics
                     </Link>
-                    <Link to="/production" className="nav-item">
+                    <Link to="/production" className={isActive('/production')}>
                         <span>🏭</span> Production
                     </Link>
-
-                    <div className="nav-divider"></div>
-                    <div className="nav-section-title">Admin</div>
-                    <Link to="/admin/users" className="nav-item">
-                        <span>👤</span> User Management
-                    </Link>
-                    <Link to="/admin/analytics" className="nav-item">
-                        <span>📈</span> Analytics
+                    <Link to="/admin/analytics" className={isActive('/admin')}>
+                        <span>📈</span> Admin
                     </Link>
                 </nav>
-            </aside>
 
-            <div className="main-content">
-                <header className="top-header">
-                    <div className="header-left">
-                        <h1>Management Portal</h1>
+                <div className="user-section">
+                    <div className="user-info">
+                        <div className="avatar">{user?.firstName?.charAt(0)}</div>
+                        <span className="user-name">{user?.firstName}</span>
                     </div>
-                    <div className="header-right">
-                        <span className="user-name">{user?.firstName} {user?.lastName}</span>
-                        <button onClick={handleLogout} className="btn btn-secondary">
-                            Logout
-                        </button>
-                    </div>
-                </header>
+                    <button onClick={handleLogout} className="btn-icon" title="Logout">
+                        🚪
+                    </button>
+                </div>
+            </header>
 
-                <main className="content">
+            <main className="main-content">
+                <div className="page-container">
                     {children}
-                </main>
-            </div>
+                </div>
+            </main>
         </div>
     );
 };

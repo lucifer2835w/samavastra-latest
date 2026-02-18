@@ -30,3 +30,22 @@ export async function login(req: Request, res: Response) {
   }
 }
 
+export async function getMe(req: any, res: Response) {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const user = await service.getUserById(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    return res.json(user);
+  } catch (error) {
+    console.error('Error in getMe:', error);
+    return res.status(500).json({ error: 'Failed to fetch user profile' });
+  }
+}
+

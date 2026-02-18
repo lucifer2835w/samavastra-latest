@@ -1,9 +1,11 @@
 import { Router } from 'express';
-import { login } from './auth.controller';
+import { login, getMe } from './auth.controller';
+import { authenticateJWT } from '../../middleware/auth';
 
 const router = Router();
 
 router.post('/login', login);
+router.get('/me', authenticateJWT, getMe);
 
 export default router;
 

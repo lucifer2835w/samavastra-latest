@@ -20,8 +20,8 @@ export const Dashboard: React.FC = () => {
             </div>
 
             <div className="stats-grid">
-                <div className="stat-card" onClick={() => navigate('/students')} style={{ cursor: 'pointer' }}>
-                    <div className="stat-icon" style={{ background: '#DBEAFE', color: '#1E40AF' }}>👥</div>
+                <div className="dashboard-stat-card" onClick={() => navigate('/students')}>
+                    <div className="dashboard-stat-icon icon-students">👥</div>
                     <div className="stat-info">
                         <h3>Students</h3>
                         <p className="stat-value">Manage</p>
@@ -29,8 +29,8 @@ export const Dashboard: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="stat-card" onClick={() => navigate('/inventory')} style={{ cursor: 'pointer' }}>
-                    <div className="stat-icon" style={{ background: '#D1FAE5', color: '#065F46' }}>📦</div>
+                <div className="dashboard-stat-card" onClick={() => navigate('/inventory')}>
+                    <div className="dashboard-stat-icon icon-inventory">📦</div>
                     <div className="stat-info">
                         <h3>Inventory</h3>
                         <p className="stat-value">Check Stock</p>
@@ -38,8 +38,8 @@ export const Dashboard: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="stat-card" onClick={() => navigate('/orders')} style={{ cursor: 'pointer' }}>
-                    <div className="stat-icon" style={{ background: '#FEF3C7', color: '#92400E' }}>🛒</div>
+                <div className="dashboard-stat-card" onClick={() => navigate('/orders')}>
+                    <div className="dashboard-stat-icon icon-orders">🛒</div>
                     <div className="stat-info">
                         <h3>Orders</h3>
                         <p className="stat-value">Process</p>
@@ -47,8 +47,8 @@ export const Dashboard: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="stat-card" onClick={() => navigate('/production')} style={{ cursor: 'pointer' }}>
-                    <div className="stat-icon" style={{ background: '#E0E7FF', color: '#3730A3' }}>🏭</div>
+                <div className="dashboard-stat-card" onClick={() => navigate('/production')}>
+                    <div className="dashboard-stat-icon icon-production">🏭</div>
                     <div className="stat-info">
                         <h3>Production</h3>
                         <p className="stat-value">Log Batch</p>
@@ -69,7 +69,7 @@ export const Dashboard: React.FC = () => {
                     <div className="activity-item">
                         <div className="activity-time">09:45 AM</div>
                         <div className="activity-content">
-                            <strong>Stock Alert:</strong> Blue Pen quantity low (15 remaining)
+                            <strong>Stock Alert:</strong> Gold Pen quantity low (15 remaining)
                         </div>
                     </div>
                     <div className="activity-item">
